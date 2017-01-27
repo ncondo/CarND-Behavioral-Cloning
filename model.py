@@ -15,15 +15,28 @@ def load_data():
 
     with open(training_file, 'r') as f:
         reader = csv.reader(f)
+        next(reader, None) # skip header
         data = list(reader)
 
-    images = []
-    steering_angle = []
-    for line in data:
-        images.append(line[0])
-        steering_angle.append(line[3])
-        images.append(line[1])
-        steering_angle.append(line[3])
-        images.append(line[2])
-        steering_angle.append(line[3])
+    image_names = []
+    steering_angles = []
 
+    for line in data:
+        image_names.append(line[0])
+        steering_angles.append(line[3])
+        image_names.append(line[1])
+        steering_angles.append(line[3])
+        image_names.append(line[2])
+        steering_angles.append(line[3])
+
+    images = []
+
+    for name in image_names:
+        image = 'data/' + str(name)
+        img = cv2.imread(image)
+        images.append(img)
+
+    images = np.asarray(images)
+    steering_angles = np.asarray(steering_angles, dtype=np.float32())
+
+    return images, steering_angles
