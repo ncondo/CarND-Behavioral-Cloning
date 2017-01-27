@@ -3,13 +3,17 @@ import tensorflow as tf
 import numpy as np
 import cv2
 import csv
+import os
+import json
 
-from keras.layers import Input, Flatten, Dense
-from keras.models import Model
+from keras.layers import Dense, Dropout, ELU, Flatten, Lambda
+from keras.layers.convolutional import Convolution2D
+from keras.models import Sequential
 
 def load_data():
     """
-    Utility function to load training data from driving_log.csv file.
+    Utility function to load training data from driving_log.csv file and
+    return two numpy arrays containing images and related steering angles.
     """
     training_file = 'data/driving_log.csv'
 
@@ -40,3 +44,31 @@ def load_data():
     steering_angles = np.asarray(steering_angles, dtype=np.float32())
 
     return images, steering_angles
+
+
+def get_model():
+    ch, row, col = 3, 160, 320 # image shape
+
+    model = Sequential()
+    model.add(Lambda(lambda x: x/127.5 - 1.,
+              input_shape=(ch, row, col),
+              output_shape=(ch, row, col)))
+    model.add(Convolution2D(16, 8, 8, subsample=(4, 4), border_mode="same"))
+    model.add(ELU())
+    model.add(Convolution2D(32, 5, 5, subsample=(2, 2), border_mode="same"))
+    model.add(ELU())
+    model.add(Convolution2D(64, 5, 5, subsample=(2, 2), border_mode="same"))
+    model.add(Flatten())
+    model.add(Dropout(.2))
+    model.add(ELU())
+    model.add(Dense(512))
+    model.add(Dropout(.5))
+    model.add(ELU())
+    model.add(Dense(1))
+
+    model.compile(optimizer="adam", loss="mse")
+
+    return model
+
+
+
