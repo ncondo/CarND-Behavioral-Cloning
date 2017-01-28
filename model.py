@@ -65,20 +65,20 @@ def get_model():
     x = Lambda(resize)(x)
     x = Lambda(normalize)(x)
     x = Convolution2D(16, 8, 8, subsample=(4, 4), border_mode='same')(x)
-    x = Activation('elu')(x)
+    x = Activation('relu')(x)
     x = Convolution2D(32, 5, 5, subsample=(2, 2), border_mode='same')(x)
-    x = Activation('elu')(x)
+    x = Activation('relu')(x)
     x = Convolution2D(64, 5, 5, subsample=(2, 2), border_mode='same')(x)
     x = Flatten()(x)
     x = Dropout(.2)(x)
-    x = Activation('elu')(x)
+    x = Activation('relu')(x)
     x = Dense(512)(x)
     x = Dropout(.5)(x)
-    x = Activation('elu')(x)
+    x = Activation('relu')(x)
     angle_out = Dense(1, name='angle_out')(x)
 
     model = Model(input=[img_in], output=[angle_out])
-    model.compile(optimizer='adam', loss='mse')
+    model.compile(optimizer='adam', loss='mse', metrics=['accuracy'])
     model.summary()
 
     """
@@ -110,7 +110,7 @@ if __name__=="__main__":
     X_train, y_train = load_data()
 
     model = get_model()
-    model.fit(X_train, y_train, nb_epoch=5, batch_size=64, validation_split=.2)
+    model.fit(X_train, y_train, nb_epoch=2, batch_size=128, validation_split=.2)
     #model.fit_generator((X_train_practice, y_train_practice), samples_per_epoch=2, nb_epoch=10)
 
     print('Saving model weights and configuration file.')
