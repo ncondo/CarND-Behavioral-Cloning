@@ -7,7 +7,7 @@ import json
 import h5py
 
 from keras.layers import Activation, Dense, Dropout, ELU, Flatten, Input, Lambda
-from keras.layers.convolutional import Convolution2D
+from keras.layers.convolutional import Convolution2D, Cropping2D
 from keras.models import Sequential, Model, load_model
 
 
