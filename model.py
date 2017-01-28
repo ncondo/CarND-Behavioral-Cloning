@@ -109,7 +109,7 @@ if __name__=="__main__":
     X_train, y_train = load_data()
 
     model = get_model()
-    model.fit(X_train, y_train, nb_epoch=10, batch_size=64, validation_split=.2)
+    model.fit(X_train, y_train, nb_epoch=3, batch_size=64, validation_split=.2)
     #model.fit_generator((X_train_practice, y_train_practice), samples_per_epoch=2, nb_epoch=10)
 
     print('Saving model weights and configuration file.')
