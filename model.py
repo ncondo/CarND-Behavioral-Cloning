@@ -1,14 +1,15 @@
-import pickle
 import tensorflow as tf
 import numpy as np
 import cv2
 import csv
 import os
 import json
+import h5py
 
 from keras.layers import Activation, Dense, Dropout, ELU, Flatten, Input, Lambda
 from keras.layers.convolutional import Convolution2D
 from keras.models import Sequential, Model, load_model
+
 
 def load_data():
     """
@@ -24,30 +25,32 @@ def load_data():
 
     image_names = []
     steering_angles = []
-
+    OFFSET = 0.2 # use offset on right and left camera images to steer car back to center of road
     for line in data:
+        center_angle = float(line[3])
+        left_angle = center_angle + OFFSET
+        right_angle = center_angle - OFFSET
         image_names.append(line[0])
-        steering_angles.append(line[3])
+        steering_angles.append(center_angle)
         image_names.append(line[1])
-        steering_angles.append(line[3])
+        steering_angles.append(left_angle)
         image_names.append(line[2])
-        steering_angles.append(line[3])
+        steering_angles.append(right_angle)
 
-    images = []
+    images = np.zeros((len(image_names), 160, 320, 3))
 
-    for name in image_names:
-        image = 'data/' + str(name)
+    for i in range(len(image_names)):
+        image = 'data/' + str(image_names[i])
         img = cv2.imread(image)
-        images.append(img)
+        images[i,:,:,:] = img
 
-    images = np.array(images)
-    steering_angles = np.asarray(steering_angles, dtype=np.float32())
+    return images, np.asarray(steering_angles, dtype=np.float32())
 
-    return images, steering_angles
 
 def resize(image):
     import tensorflow as tf
     return tf.image.resize_images(image, (66, 200))
+
 
 def normalize(image):
     return image / 127.5 - 1.
@@ -58,7 +61,6 @@ def get_model():
     img_in = Input(shape=(160, 320, 3), name='img_in')
     angle_in = Input(shape=(1,), name='angle_in')
 
-    #x = Lambda(lambda x: x/127.5 - 1.)(img_in)
     x = Lambda(resize)(img_in)
     x = Lambda(normalize)(x)
     x = Convolution2D(16, 8, 8, subsample=(4, 4), border_mode='same')(x)
@@ -98,29 +100,22 @@ def get_model():
 
     model.compile(optimizer="adam", loss="mse")
     """
-
     return model
 
 
 if __name__=="__main__":
+    
     X_train, y_train = load_data()
-    print(X_train.shape)
-    print(X_train.shape[0])
-    #X_train = X_train.reshape(X_train.shape[0], 3, 160, 320)
-    #X_train = X_train.astype('float32')
-
-    X_train_practice = X_train[:10]
-    y_train_practice = y_train[:10]
-    X_val_practice = X_train[10:20]
-    y_val_practice = y_train[10:20]
-
-    print(X_train.shape)
-    print(X_train_practice[0].shape)
 
     model = get_model()
-    #model.fit(X_train_practice, y_train_practice, nb_epoch=10)
+    model.fit(X_train, y_train, nb_epoch=10, validation_split=.2)
     #model.fit_generator((X_train_practice, y_train_practice), samples_per_epoch=2, nb_epoch=10)
 
+    print('Saving model weights and configuration file.')
 
+    model.save_weights('model.h5')
+
+    with open('model.json', 'w') as outfile:
+        json.dump(model.to_json(), outfile)
 
 

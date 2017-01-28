@@ -19,6 +19,8 @@ from keras.preprocessing.image import ImageDataGenerator, array_to_img, img_to_a
 import tensorflow as tf
 tf.python.control_flow_ops = tf
 
+from skimage.transform import resize
+
 
 sio = socketio.Server()
 app = Flask(__name__)
@@ -37,6 +39,9 @@ def telemetry(sid, data):
     imgString = data["image"]
     image = Image.open(BytesIO(base64.b64decode(imgString)))
     image_array = np.asarray(image)
+    for image in image_array:
+        image = resize(image, (66, 120))
+        image = image / 127.5 - 1.
     transformed_image_array = image_array[None, :, :, :]
     # This model currently assumes that the features of the model are just the images. Feel free to change this.
     steering_angle = float(model.predict(transformed_image_array, batch_size=1))
@@ -67,11 +72,8 @@ if __name__ == '__main__':
     with open(args.model, 'r') as jfile:
         # NOTE: if you saved the file by calling json.dump(model.to_json(), ...)
         # then you will have to call:
-        #
-        #   model = model_from_json(json.loads(jfile.read()))\
-        #
-        # instead.
-        model = model_from_json(jfile.read())
+        model = model_from_json(json.loads(jfile.read()))
+        # model = model_from_json(jfile.read())
 
 
     model.compile("adam", "mse")
