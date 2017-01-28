@@ -84,7 +84,7 @@ def get_model():
     row, col, ch = 160, 320, 3 # image shape
 
     model = Sequential()
-    model.add(Lambda(resize), input_shape=(row, col, ch))
+    model.add(Lambda(resize, input_shape=(row, col, ch))
     model.add(Lambda(normalize))
     model.add(Convolution2D(16, 8, 8, subsample=(4, 4), border_mode="same"))
     model.add(ELU())
