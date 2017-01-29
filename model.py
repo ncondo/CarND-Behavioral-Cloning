@@ -57,9 +57,6 @@ def normalize(image):
 
 
 def get_model():
-    
-    img_in = Input(shape=(160, 320, 3), name='img_in')
-    angle_in = Input(shape=(1,), name='angle_in')
 
     model = Sequential([
         # Crop area above the horizon
