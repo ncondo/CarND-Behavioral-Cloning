@@ -47,6 +47,7 @@ def generate_data(data_list, batch_size=64):
         steering_angles.append(right_angle)
 
     images = np.zeros((batch_size, 160, 320, 3))
+    angles = np.zeros((batch_size, 1))
     while True:
         shuffle_list = list(zip(image_names, steering_angles))
         random.shuffle(shuffle_list)
@@ -55,7 +56,8 @@ def generate_data(data_list, batch_size=64):
             image = 'data/' + str(image_names[i])
             img = cv2.imread(image)
             images[i,:,:,:] = img
-        yield images, np.asarray(steering_angles, dtype=np.float32())
+            angles[i,:] = angles[i]
+        yield images, angles
 
 
 
