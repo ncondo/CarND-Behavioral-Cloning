@@ -94,19 +94,19 @@ def get_model():
         # Dropout with keep probability of .2
         Dropout(.2),
         # Fully-connected layer 1 | 100 neurons
-        Dense(100, init='he_normal'),
+        Dense(100, activation='relu', init='he_normal'),
         # Dropout with keep probability of .5
         Dropout(.5),
         # Fully-connected layer 2 | 50 neurons
-        Dense(50, init='he_normal'),
+        Dense(50, activation='relu', init='he_normal'),
         # Dropout with keep probability of .5
         Dropout(.5),
         # Fully-connected layer 3 | 10 neurons
-        Dense(10, init='he_normal'),
+        Dense(10, activation='relu', init='he_normal'),
         # Dropout with keep probability of .5
         Dropout(.5),
         # Output
-        Dense(1, init='he_normal')
+        Dense(1, activation='relu', init='he_normal')
     ])
 
     model.compile(optimizer='adam', loss='mse')
