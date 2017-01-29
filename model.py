@@ -1,5 +1,6 @@
 import tensorflow as tf
 import numpy as np
+import random
 import cv2
 import csv
 import os
@@ -11,40 +12,51 @@ from keras.layers.convolutional import Convolution2D, Cropping2D
 from keras.models import Sequential, Model, load_model
 
 
-def load_data():
+def get_csv_data(file):
     """
-    Utility function to load training data from driving_log.csv file and
-    return two numpy arrays containing images and related steering angles.
-    """
-    training_file = 'data/driving_log.csv'
+    Utility function to load training data from a csv file and
+    return data as a python list.
 
+    param: path of csv file containing the data
+    """
     with open(training_file, 'r') as f:
         reader = csv.reader(f)
         next(reader, None) # skip header
-        data = list(reader)
+        data_list = list(reader)
+
+    return data_list
+
+
+def generate_data(data_list, batch_size=64):
 
     image_names = []
     steering_angles = []
+
     OFFSET = 0.2 # use offset on right and left camera images to steer car back to center of road
-    for line in data:
-        #center_angle = float(line[3])
-        #left_angle = center_angle + OFFSET
-        #right_angle = center_angle - OFFSET
-        image_names.append(line[0])
-        steering_angles.append(line[3])
-        #image_names.append(line[1])
-        #steering_angles.append(left_angle)
-        #image_names.append(line[2])
-        #steering_angles.append(right_angle)
+    for line in data_list:
+        center_angle = float(line[3])
+        left_angle = center_angle + OFFSET
+        right_angle = center_angle - OFFSET
+        # Discard steering angles of 0 to reduce bias of driving straight
+        if center_angle != 0:
+            image_names.append(line[0])
+            steering_angles.append(center_angle)
+        image_names.append(line[1])
+        steering_angles.append(left_angle)
+        image_names.append(line[2])
+        steering_angles.append(right_angle)
 
-    images = np.zeros((len(image_names), 160, 320, 3))
+    images = np.zeros((batch_size, 160, 320, 3))
+    while True:
+        shuffle_list = list(zip(image_names, steering_angles))
+        random.shuffle(shuffle_list)
+        image_names, steering_angles = zip(*shuffle_list)
+        for i in range(batch_size):
+            image = 'data/' + str(image_names[i])
+            img = cv2.imread(image)
+            images[i,:,:,:] = img
+        yield images, np.asarray(steering_angles, dtype=np.float32())
 
-    for i in range(len(image_names)):
-        image = 'data/' + str(image_names[i])
-        img = cv2.imread(image)
-        images[i,:,:,:] = img
-
-    return images, np.asarray(steering_angles, dtype=np.float32())
 
 
 def resize(image):
@@ -104,11 +116,11 @@ def get_model():
 
 if __name__=="__main__":
     
-    X_train, y_train = load_data()
+    data_list = get_csv_data('data/driving_log.csv')
 
     model = get_model()
-    model.fit(X_train, y_train, nb_epoch=10, batch_size=64, validation_split=.2)
-    #model.fit_generator((X_train_practice, y_train_practice), samples_per_epoch=2, nb_epoch=10)
+    #model.fit(X_train, y_train, nb_epoch=10, batch_size=64, validation_split=.2)
+    model.fit_generator(generate_data(data_list), samples_per_epoch=1024, nb_epoch=5, validation_data=generate_data(data_list))
 
     print('Saving model weights and configuration file.')
 
