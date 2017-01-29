@@ -57,7 +57,7 @@ def normalize(image):
 
 
 def get_model():
-    
+    """
     img_in = Input(shape=(160, 320, 3), name='img_in')
     angle_in = Input(shape=(1,), name='angle_in')
 
@@ -85,13 +85,12 @@ def get_model():
     row, col, ch = 160, 320, 3 # image shape
 
     model = Sequential()
-    model.add(Lambda(resize, input_shape=(row, col, ch)))
-    model.add(Lambda(normalize))
-    model.add(Convolution2D(16, 8, 8, subsample=(4, 4), border_mode="same"))
+    model.add(Lambda(lambda x: x/127.5 - 1., input_shape=(row, col, ch), output_shape=(row, col, ch)))
+    model.add(Convolution2D(16, 8, 8, subsample=(4, 4), border_mode='same'))
     model.add(ELU())
-    model.add(Convolution2D(32, 5, 5, subsample=(2, 2), border_mode="same"))
+    model.add(Convolution2D(32, 5, 5, subsample=(2, 2), border_mode='same'))
     model.add(ELU())
-    model.add(Convolution2D(64, 5, 5, subsample=(2, 2), border_mode="same"))
+    model.add(Convolution2D(64, 5, 5, subsample=(2, 2), border_mode='same'))
     model.add(Flatten())
     model.add(Dropout(.2))
     model.add(ELU())
@@ -100,8 +99,8 @@ def get_model():
     model.add(ELU())
     model.add(Dense(1))
 
-    model.compile(optimizer="adam", loss="mse")
-    """
+    model.compile(optimizer="adam", loss="mse", metrics=['accuracy'])
+    model.summary()
     return model
 
 
@@ -110,7 +109,7 @@ if __name__=="__main__":
     X_train, y_train = load_data()
 
     model = get_model()
-    model.fit(X_train, y_train, nb_epoch=1, batch_size=128, validation_split=.2)
+    model.fit(X_train, y_train, nb_epoch=5, batch_size=64, validation_split=.2)
     #model.fit_generator((X_train_practice, y_train_practice), samples_per_epoch=2, nb_epoch=10)
 
     print('Saving model weights and configuration file.')
