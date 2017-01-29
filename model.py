@@ -56,7 +56,7 @@ def generate_data(data_list, batch_size=64):
             image = 'data/' + str(image_names[i])
             img = cv2.imread(image)
             images[i,:,:,:] = img
-            angles[i,:] = angles[i]
+            angles[i,:] = steering_angles[i]
         yield images, angles
 
 
@@ -109,7 +109,7 @@ def get_model():
         Dense(1, init='he_normal')
     ])
 
-    model.compile(optimizer='adam', loss='mse', metrics=['accuracy'])
+    model.compile(optimizer='adam', loss='mse')
     model.summary()
 
     return model
