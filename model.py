@@ -60,7 +60,7 @@ def get_model():
 
     model = Sequential([
         # Crop area above the horizon
-        Cropping2D(cropping=((22, 0), (0, 0)), input_shape=(160, 320, 3)),
+        #Cropping2D(cropping=((22, 0), (0, 0)), input_shape=(160, 320, 3)),
         # Resize image to 66X200X3
         Lambda(resize),
         # Normalize image to -1.0 to 1.0
@@ -107,7 +107,7 @@ if __name__=="__main__":
     X_train, y_train = load_data()
 
     model = get_model()
-    model.fit(X_train, y_train, nb_epoch=5, batch_size=64, validation_split=.2)
+    model.fit(X_train, y_train, nb_epoch=10, batch_size=64, validation_split=.2)
     #model.fit_generator((X_train_practice, y_train_practice), samples_per_epoch=2, nb_epoch=10)
 
     print('Saving model weights and configuration file.')
