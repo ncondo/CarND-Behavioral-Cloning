@@ -62,7 +62,7 @@ def get_model():
         # Crop area above the horizon
         #Cropping2D(cropping=((22, 0), (0, 0)), input_shape=(160, 320, 3)),
         # Resize image to 66X200X3
-        Lambda(resize),
+        Lambda(resize, input_shape=(160, 320, 3)),
         # Normalize image to -1.0 to 1.0
         Lambda(normalize),
         # Convolutional layer 1 24@31x98 | 5x5 kernel | 2x2 stride | relu activation 
