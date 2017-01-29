@@ -27,15 +27,15 @@ def load_data():
     steering_angles = []
     OFFSET = 0.2 # use offset on right and left camera images to steer car back to center of road
     for line in data:
-        center_angle = float(line[3])
-        left_angle = center_angle + OFFSET
-        right_angle = center_angle - OFFSET
+        #center_angle = float(line[3])
+        #left_angle = center_angle + OFFSET
+        #right_angle = center_angle - OFFSET
         image_names.append(line[0])
-        steering_angles.append(center_angle)
-        image_names.append(line[1])
-        steering_angles.append(left_angle)
-        image_names.append(line[2])
-        steering_angles.append(right_angle)
+        steering_angles.append(line[3])
+        #image_names.append(line[1])
+        #steering_angles.append(left_angle)
+        #image_names.append(line[2])
+        #steering_angles.append(right_angle)
 
     images = np.zeros((len(image_names), 160, 320, 3))
 
