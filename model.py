@@ -120,4 +120,8 @@ if __name__=="__main__":
     with open('model.json', 'w') as outfile:
         json.dump(model.to_json(), outfile)
 
+    from keras import backend as K 
+
+    K.clear_session()
+
 
