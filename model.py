@@ -106,7 +106,7 @@ def get_model():
         # Dropout with keep probability of .5
         Dropout(.5),
         # Output
-        Dense(1, activation='relu', init='he_normal')
+        Dense(1, init='he_normal')
     ])
 
     model.compile(optimizer='adam', loss='mse')
