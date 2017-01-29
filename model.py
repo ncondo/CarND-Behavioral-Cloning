@@ -12,7 +12,7 @@ from keras.layers.convolutional import Convolution2D, Cropping2D
 from keras.models import Sequential, Model, load_model
 
 
-def get_csv_data(file):
+def get_csv_data(training_file):
     """
     Utility function to load training data from a csv file and
     return data as a python list.
