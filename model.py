@@ -1,5 +1,6 @@
 import tensorflow as tf
 import numpy as np
+from PIL import Image
 import random
 import cv2
 import csv
@@ -136,7 +137,7 @@ if __name__=="__main__":
     data_list = get_csv_data(training_file)
 
     model = get_model()
-    model.fit_generator(generate_batch(training_file), samples_per_epoch=10240, nb_epoch=10, validation_data=generate_batch(training_file), nb_val_samples=1024)
+    model.fit_generator(generate_batch(data_list), samples_per_epoch=10240, nb_epoch=40, validation_data=generate_batch(data_list), nb_val_samples=1024)
 
     print('Saving model weights and configuration file.')
 
