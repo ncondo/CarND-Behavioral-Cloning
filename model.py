@@ -52,14 +52,18 @@ def resize(image):
 def normalize(image):
     return image / 127.5 - 1.
 
+def crop_image(image):
+    return image[:, :, 20:-1, :]
+
 
 def get_model():
 
     model = Sequential([
         # Crop area above the horizon
         #Cropping2D(cropping=((22, 0), (0, 0)), input_shape=(160, 320, 3)),
+        Lambda(crop_image, input_shape=(160, 320, 3)),
         # Resize image to 66X200X3
-        Lambda(resize, input_shape=(160, 320, 3)),
+        Lambda(resize),
         # Normalize image to -1.0 to 1.0
         Lambda(normalize),
         # Convolutional layer 1 24@31x98 | 5x5 kernel | 2x2 stride | relu activation 
