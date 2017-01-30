@@ -38,8 +38,10 @@ def generate_batch(data_list, batch_size=64):
         for i in range(batch_size):
             row = random.randrange(len(data_list))
             image_choice = random.randrange(len(OFFSETS))
-            image = Image.open('data/' + str(data_list[row][image_choice]).strip())
+            #image = Image.open('data/' + str(data_list[row][image_choice]).strip())
+            image = cv2.imread('data/' + str(data_list[row][image_choice]).strip())
             image = np.array(image, dtype=np.float32)
+            image = cv2.cvtColor(image, cv2.COLOR_BGR2YUV)
             images[i] = image
             angles[i] = float(data_list[row][3]) + OFFSETS[image_choice]
         yield images, angles
@@ -56,12 +58,17 @@ def normalize(image):
 def crop_image(image):
     return image[:, :, 60:-20, :]
 
+def bgr_to_yuv(image):
+    yuv = cv2.cvtColor(image, cv2.COLOR_BGR2YUV)
+    return yuv
+
 
 def get_model():
 
     model = Sequential([
-        # Crop area above the horizon
-        #Cropping2D(cropping=((22, 0), (0, 0)), input_shape=(160, 320, 3)),
+        # Convert image to YUV color space
+        #Lambda(bgr_to_yuv, input_shape=(160, 320, 3)),
+        #Crop area above image and car hood
         Lambda(crop_image, input_shape=(160, 320, 3)),
         # Resize image to 66X200X3
         Lambda(resize),
