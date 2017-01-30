@@ -26,6 +26,41 @@ def get_csv_data(training_file):
 
     return data_list
 
+def generate_data_from_file(path, batch_size=64):
+    data_list = get_csv_data(path)
+    OFFSET = 0.2
+    images = np.zeros((batch_size, 160, 320, 3))
+    angles = np.zeros((batch_size, 1))
+    i = 0
+    while True:
+        for line in data_list:
+            center_angle = float(line[3])
+            image = 'data/' + str(line[0])
+            img = cv2.imread(image)
+            images[i,:,:,:] = img
+            angles[i,:] = center_angle
+
+            images[i+1,:,:,:] = np.fliplr(img)
+            angles[i+1,:] = -center_angle
+
+            left_angle = center_angle + OFFSET
+            image = 'data/' + str(line[1])
+            img = cv2.imread(image)
+            images[i+2,:,:,:] = img
+            angles[i+2,:] = left_angle
+
+            right_angle = center_angle + OFFSET
+            image = 'data/' + str(line[2])
+            img = cv2.imread(image)
+            images[i+3,:,:,:] = img
+            angles[i+3,:] = right_angle
+
+            i += 4
+            if i == batch_size:
+                i = 0
+                yield images, angles
+
+
 
 def generate_data(data_list, batch_size=64):
 
@@ -118,11 +153,11 @@ def get_model():
 
 if __name__=="__main__":
     
-    data_list = get_csv_data('data/driving_log.csv')
+    #data_list = get_csv_data('data/driving_log.csv')
 
     model = get_model()
     #model.fit(X_train, y_train, nb_epoch=10, batch_size=64, validation_split=.2)
-    model.fit_generator(generate_data(data_list), samples_per_epoch=10240, nb_epoch=10, validation_data=generate_data(data_list), nb_val_samples=1024)
+    model.fit_generator(generate_data_from_file('data/driving_log.csv'), samples_per_epoch=10240, nb_epoch=10, validation_data=generate_data_from_file('data/driving_log.csv'), nb_val_samples=1024)
 
     print('Saving model weights and configuration file.')
 
