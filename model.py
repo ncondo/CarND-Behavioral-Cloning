@@ -28,50 +28,19 @@ def get_csv_data(training_file):
 
     return data_list
 
-def generate_data_from_file(path, batch_size=64):
-    data_list = get_csv_data(path)
-    OFFSET = 0.2
-    images = np.zeros((batch_size, 160, 320, 3))
-    angles = np.zeros(batch_size)
-    i = 0
-    while True:
-        for line in data_list:
-            center_angle = float(line[3])
-            image = 'data/' + str(line[0])
-            img = cv2.imread(image)
-            images[i,:,:,:] = img
-            angles[i] = center_angle
-
-            images[i+1,:,:,:] = np.fliplr(img)
-            angles[i+1] = -center_angle
-
-            left_angle = center_angle + OFFSET
-            image = 'data/' + str(line[1])
-            img = cv2.imread(image)
-            images[i+2,:,:,:] = img
-            angles[i+2] = left_angle
-
-            right_angle = center_angle + OFFSET
-            image = 'data/' + str(line[2])
-            img = cv2.imread(image)
-            images[i+3,:,:,:] = img
-            angles[i+3] = right_angle
-
-            i += 4
-            if i == batch_size:
-                i = 0
-                yield images, angles
 
 def generate_batch(data_list, batch_size=64):
     images = np.zeros((batch_size, 160, 320, 3), dtype=np.float32)
     angles = np.zeros((batch_size,), dtype=np.float32)
+    OFFSETS = [0, .2, -.2]
     while 1:
         for i in range(batch_size):
-            random = int(np.random.choice(len(data_list), 1))
-            image = Image.open('data/' + data_list[random][0])
+            row = int(np.random.choice(len(data_list), 1))
+            image_choice = int(np.random.choice(len(OFFSETS), 1))
+            image = Image.open('data/' + data_list[row][image_choice])
             image = np.array(image, dtype=np.float32)
             images[i] = image
-            angles[i] = data_list[random][3]
+            angles[i] = float(data_list[row][3]) + OFFSETS[image_choice]
         yield images, angles
 
 
