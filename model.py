@@ -2,8 +2,8 @@ import tensorflow as tf
 import numpy as np
 from PIL import Image
 import random
-import cv2
 import csv
+import cv2
 import os
 import json
 import h5py
@@ -38,10 +38,9 @@ def generate_batch(data_list, batch_size=64):
         for i in range(batch_size):
             row = random.randrange(len(data_list))
             image_choice = random.randrange(len(OFFSETS))
-            #image = Image.open('data/' + str(data_list[row][image_choice]).strip())
-            image = cv2.imread('data/' + str(data_list[row][image_choice]).strip())
+            image = Image.open('data/' + str(data_list[row][image_choice]).strip())
             image = np.array(image, dtype=np.float32)
-            image = cv2.cvtColor(image, cv2.COLOR_BGR2YUV)
+            image = random_brightness(image)
             images[i] = image
             angles[i] = float(data_list[row][3]) + OFFSETS[image_choice]
         yield images, angles
@@ -55,19 +54,22 @@ def resize(image):
 def normalize(image):
     return image / 127.5 - 1.
 
+
 def crop_image(image):
     return image[:, :, 60:-20, :]
 
-def bgr_to_yuv(image):
-    yuv = cv2.cvtColor(image, cv2.COLOR_BGR2YUV)
-    return yuv
+
+def random_brightness(image):
+    image = cv2.cvtColor(image, cv2.COLOR_RGB2HSV)
+    random_brightness = .1 + np.random.uniform()
+    image[:,:,2] = image[:,:,2] * random_brightness
+    image = cv2.cvtColor(image, cv2.COLOR_HSV2RGB)
+    return image
 
 
 def get_model():
 
     model = Sequential([
-        # Convert image to YUV color space
-        #Lambda(bgr_to_yuv, input_shape=(160, 320, 3)),
         #Crop area above image and car hood
         Lambda(crop_image, input_shape=(160, 320, 3)),
         # Resize image to 66X200X3
