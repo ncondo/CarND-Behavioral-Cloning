@@ -23,6 +23,7 @@ def get_csv_data(training_file):
         reader = csv.reader(f)
         next(reader, None) # skip header
         data_list = list(reader)
+    f.close()
 
     return data_list
 
@@ -30,7 +31,7 @@ def generate_data_from_file(path, batch_size=64):
     data_list = get_csv_data(path)
     OFFSET = 0.2
     images = np.zeros((batch_size, 160, 320, 3))
-    angles = np.zeros((batch_size, 1))
+    angles = np.zeros(batch_size)
     i = 0
     while True:
         for line in data_list:
@@ -38,22 +39,22 @@ def generate_data_from_file(path, batch_size=64):
             image = 'data/' + str(line[0])
             img = cv2.imread(image)
             images[i,:,:,:] = img
-            angles[i,:] = center_angle
+            angles[i] = center_angle
 
             images[i+1,:,:,:] = np.fliplr(img)
-            angles[i+1,:] = -center_angle
+            angles[i+1] = -center_angle
 
             left_angle = center_angle + OFFSET
             image = 'data/' + str(line[1])
             img = cv2.imread(image)
             images[i+2,:,:,:] = img
-            angles[i+2,:] = left_angle
+            angles[i+2] = left_angle
 
             right_angle = center_angle + OFFSET
             image = 'data/' + str(line[2])
             img = cv2.imread(image)
             images[i+3,:,:,:] = img
-            angles[i+3,:] = right_angle
+            angles[i+3] = right_angle
 
             i += 4
             if i == batch_size:
