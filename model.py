@@ -80,7 +80,7 @@ def get_model():
         # Flatten
         Flatten(),
         # Dropout with keep probability of .2
-        Dropout(.2),
+        Dropout(.5),
         # Fully-connected layer 1 | 100 neurons
         Dense(100, activation='relu', init='he_normal'),
         # Dropout with keep probability of .5
@@ -90,9 +90,9 @@ def get_model():
         # Dropout with keep probability of .5
         Dropout(.5),
         # Fully-connected layer 3 | 10 neurons
-        Dense(10, activation='relu', W_regularizer=l2(0.01), init='he_normal'),
+        Dense(10, activation='relu', init='he_normal'),
         # Dropout with keep probability of .5
-        #Dropout(.5),
+        Dropout(.2),
         # Output
         Dense(1, init='he_normal')
     ])
