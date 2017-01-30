@@ -90,9 +90,9 @@ def get_model():
         # Dropout with keep probability of .5
         Dropout(.5),
         # Fully-connected layer 3 | 10 neurons
-        Dense(10, activation='relu',W_regularizer=l2(0.01), init='he_normal'),
+        Dense(10, activation='relu', W_regularizer=l2(0.01), init='he_normal'),
         # Dropout with keep probability of .5
-        Dropout(.5),
+        #Dropout(.5),
         # Output
         Dense(1, init='he_normal')
     ])
