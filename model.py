@@ -35,8 +35,8 @@ def generate_batch(data_list, batch_size=64):
     OFFSETS = [0, .2, -.2]
     while 1:
         for i in range(batch_size):
-            row = int(np.random.choice(len(data_list), 1))
-            image_choice = int(np.random.choice(len(OFFSETS), 1))
+            row = random.randrange(len(data_list))
+            image_choice = random.randrange(len(OFFSETS))
             image = Image.open('data/' + str(data_list[row][image_choice]).strip())
             image = np.array(image, dtype=np.float32)
             images[i] = image
