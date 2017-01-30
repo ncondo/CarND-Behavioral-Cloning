@@ -53,7 +53,7 @@ def normalize(image):
     return image / 127.5 - 1.
 
 def crop_image(image):
-    return image[:, :, 20:-1, :]
+    return image[:, :, 60:-20, :]
 
 
 def get_model():
