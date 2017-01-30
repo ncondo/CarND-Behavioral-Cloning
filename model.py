@@ -120,7 +120,7 @@ if __name__=="__main__":
     data_list = get_csv_data(training_file)
 
     model = get_model()
-    model.fit_generator(generate_batch(data_list), samples_per_epoch=10240, nb_epoch=40, validation_data=generate_batch(data_list), nb_val_samples=1024)
+    model.fit_generator(generate_batch(data_list), samples_per_epoch=10240, nb_epoch=60, validation_data=generate_batch(data_list), nb_val_samples=1024)
 
     print('Saving model weights and configuration file.')
 
