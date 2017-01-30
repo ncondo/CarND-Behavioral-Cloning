@@ -61,40 +61,17 @@ def generate_data_from_file(path, batch_size=64):
                 i = 0
                 yield images, angles
 
-
-
-def generate_data(data_list, batch_size=64):
-
-    image_names = []
-    steering_angles = []
-
-    OFFSET = 0.2 # use offset on right and left camera images to steer car back to center of road
-    for line in data_list:
-        center_angle = float(line[3])
-        left_angle = center_angle + OFFSET
-        right_angle = center_angle - OFFSET
-        # Discard steering angles of 0 to reduce bias of driving straight
-        if center_angle != 0:
-            image_names.append(line[0])
-            steering_angles.append(center_angle)
-        image_names.append(line[1])
-        steering_angles.append(left_angle)
-        image_names.append(line[2])
-        steering_angles.append(right_angle)
-
-    images = np.zeros((batch_size, 160, 320, 3))
-    angles = np.zeros((batch_size, 1))
-    while True:
-        shuffle_list = list(zip(image_names, steering_angles))
-        random.shuffle(shuffle_list)
-        image_names, steering_angles = zip(*shuffle_list)
+def generate_batch(data_list, batch_size=64):
+    images = np.zeros((batch_size, 160, 320, 3), dtype=np.float32)
+    angles = np.zeros((batch_size,), dtype=np.float32)
+    while 1:
         for i in range(batch_size):
-            image = 'data/' + str(image_names[i])
-            img = cv2.imread(image)
-            images[i,:,:,:] = img
-            angles[i,:] = steering_angles[i]
+            random = int(np.random.choice(len(data_list), 1))
+            image = Image.open('data/' + data_list[random][0])
+            image = np.array(image, dtype=np.float32)
+            images[i] = image
+            angles[i] = data_list[random][3]
         yield images, angles
-
 
 
 def resize(image):
@@ -153,12 +130,13 @@ def get_model():
 
 
 if __name__=="__main__":
-    
-    #data_list = get_csv_data('data/driving_log.csv')
+
+    training_file = 'data/driving_log.csv'
+
+    data_list = get_csv_data(training_file)
 
     model = get_model()
-    #model.fit(X_train, y_train, nb_epoch=10, batch_size=64, validation_split=.2)
-    model.fit_generator(generate_data_from_file('data/driving_log.csv'), samples_per_epoch=10240, nb_epoch=10, validation_data=generate_data_from_file('data/driving_log.csv'), nb_val_samples=1024)
+    model.fit_generator(generate_batch(training_file), samples_per_epoch=10240, nb_epoch=10, validation_data=generate_batch(training_file), nb_val_samples=1024)
 
     print('Saving model weights and configuration file.')
 
