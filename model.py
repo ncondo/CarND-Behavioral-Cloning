@@ -155,7 +155,7 @@ if __name__=="__main__":
     X_train, y_train = get_csv_data(training_file)
 
     model = get_model()
-    model.fit_generator(generate_batch_2(X_train, y_train), samples_per_epoch=28416, nb_epoch=40)#, validation_data=generate_batch_2(X_train, y_train), nb_val_samples=1024)
+    model.fit_generator(generate_batch_2(X_train, y_train), samples_per_epoch=28426, nb_epoch=40)#, validation_data=generate_batch_2(X_train, y_train), nb_val_samples=1024)
 
     print('Saving model weights and configuration file.')
 
