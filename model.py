@@ -106,11 +106,11 @@ def crop_image(image):
 
 
 def random_brightness(image):
-    image = cv2.cvtColor(image, cv2.COLOR_RGB2HSV)
-    random_brightness = .1 + np.random.uniform()
-    image[:,:,2] = image[:,:,2] * random_brightness
-    image = cv2.cvtColor(image, cv2.COLOR_HSV2RGB)
-    return image
+    bright_image = cv2.cvtColor(image, cv2.COLOR_RGB2HSV)
+    random_brightness = .25 + np.random.uniform()
+    bright_image[:,:,2] = bright_image[:,:,2] * random_brightness
+    bright_image = cv2.cvtColor(image, cv2.COLOR_HSV2RGB)
+    return bright_image
 
 
 def get_model():
@@ -167,7 +167,7 @@ if __name__=="__main__":
     data_list = get_csv_data(training_file)
 
     model = get_model()
-    model.fit_generator(generate_batch(data_list), samples_per_epoch=28416, nb_epoch=20, validation_data=generate_batch(data_list), nb_val_samples=1024)
+    model.fit_generator(generate_batch(data_list), samples_per_epoch=24000, nb_epoch=10, validation_data=generate_batch(data_list), nb_val_samples=1024)
 
     print('Saving model weights and configuration file.')
 
