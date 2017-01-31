@@ -48,20 +48,20 @@ def get_csv_data(training_file):
     return image_names, steering_angles
 
 
-def generate_batch_2(X_train, y_train, samples_per_epoch=28416, batch_size=64):
-    image_names = X_train
-    steering_angles = y_train
+def generate_batch_2(X_train, y_train, batch_size=64):
+    images = np.zeros((batch_size, 160, 320, 3), dtype=np.float32)
+    angles = np.zeros((batch_size,), dtype=np.float32)
     while 1:
-        for i in range(0, samples_per_epoch, batch_size):
-            images = np.zeros((batch_size, 160, 320, 3), dtype=np.float32)
-            angles = np.zeros((batch_size,), dtype=np.float32)
-            for j in range(0, batch_size, 1):
-                image = Image.open('data/' + image_names[i+j])
-                image = np.array(image, dtype=np.float32)
-                image = random_brightness(image)
-                images[j] = image
-                angles[j] = steering_angles[i+j]
-            yield images, angles
+        shuffled = list(zip(X_train, y_train))
+        random.shuffle(shuffled)
+        X_train, y_train = zip(*shuffled)
+        for i in range(batch_size):
+            image = Image.open('data/' + X_train[i])
+            image = np.array(image, dtype=np.float32)
+            image = random_brightness(image)
+            images[i] = image
+            angles[i] = y_train[i]
+        yield images, angles
 
 
 
