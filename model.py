@@ -109,7 +109,7 @@ def random_brightness(image):
     image = cv2.cvtColor(image, cv2.COLOR_RGB2HSV)
     random_brightness = .1 + np.random.uniform()
     image[:,:,2] = image[:,:,2] * random_brightness
-    #image = cv2.cvtColor(image, cv2.COLOR_HSV2RGB)
+    image = cv2.cvtColor(image, cv2.COLOR_HSV2RGB)
     return image
 
 
