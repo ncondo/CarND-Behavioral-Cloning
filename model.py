@@ -60,9 +60,9 @@ def get_csv_data(training_file):
 
 
 def generate_batch_2(X_train, y_train, batch_size=64):
+    images = np.zeros((batch_size, 160, 320, 3), dtype=np.float32)
+    angles = np.zeros((batch_size,), dtype=np.float32)
     while 1:
-        images = np.zeros((batch_size, 160, 320, 3), dtype=np.float32)
-        angles = np.zeros((batch_size,), dtype=np.float32)
         shuffled = list(zip(X_train, y_train))
         random.shuffle(shuffled)
         X_train, y_train = zip(*shuffled)
@@ -83,13 +83,19 @@ def generate_batch(data_list, batch_size=64):
     while 1:
         for i in range(batch_size):
             row = random.randrange(len(data_list))
-            image_choice = random.randrange(len(OFFSETS))
-            image = Image.open('data/' + str(data_list[row][image_choice]).strip())
-            image = np.array(image, dtype=np.float32)
-            #image = random_brightness(image)
+            image_index = random.randrange(len(OFFSETS))
+            #image = Image.open('data/' + str(data_list[row][image_choice]).strip())
+            image = cv2.imread('data/' + str(data_list[row][image_index]).strip())
+            image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
             image = process_image(image)
+            image = np.array(image, dtype=np.float32)
+            angle = float(data_list[row][3]) + OFFSETS[image_index]
+            # Flip image 50% of the time
+            if np.random.randint(2) == 0:
+                image = cv2.flip(image, 1)
+                angle = -angle
             images[i] = image
-            angles[i] = float(data_list[row][3]) + OFFSETS[image_choice]
+            angles[i] = angle
         yield images, angles
 
 
@@ -107,11 +113,11 @@ def crop_image(image):
 
 
 def random_brightness(image):
-    bright_image = cv2.cvtColor(image, cv2.COLOR_RGB2HSV)
-    random_brightness = .25 + np.random.uniform()
-    bright_image[:,:,2] = bright_image[:,:,2] * random_brightness
-    #bright_image = cv2.cvtColor(image, cv2.COLOR_HSV2RGB)
-    return bright_image
+    image = cv2.cvtColor(image, cv2.COLOR_RGB2HSV)
+    brightness = .25 + np.random.uniform()
+    image[:,:,2] = image[:,:,2] * brightness
+    #image = cv2.cvtColor(image, cv2.COLOR_HSV2RGB)
+    return image
 
 
 def process_image(image):
