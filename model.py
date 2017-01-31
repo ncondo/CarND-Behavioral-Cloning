@@ -14,7 +14,7 @@ from keras.models import Sequential, Model, load_model
 from keras.regularizers import l2
 
 
-def get_csv_data(training_file):
+def get_csv_data_2(training_file):
     """
     Utility function to load training data from a csv file and
     return data as a python list.
@@ -46,6 +46,17 @@ def get_csv_data(training_file):
     f.close()
 
     return image_names, steering_angles
+
+
+def get_csv_data(training_file):
+    with open(training_file, 'r') as f:
+        reader = csv.reader(f)
+        next(reader, None)
+        data_list = list(reader)
+
+    f.close()
+
+    return data_list
 
 
 def generate_batch_2(X_train, y_train, batch_size=64):
@@ -152,10 +163,11 @@ if __name__=="__main__":
 
     training_file = 'data/driving_log.csv'
 
-    X_train, y_train = get_csv_data(training_file)
+    #X_train, y_train = get_csv_data(training_file)
+    data_list = get_csv_data(training_file)
 
     model = get_model()
-    model.fit_generator(generate_batch_2(X_train, y_train), samples_per_epoch=28416, nb_epoch=8, validation_data=generate_batch_2(X_train, y_train), nb_val_samples=1024)
+    model.fit_generator(generate_batch(data_list), samples_per_epoch=28416, nb_epoch=8, validation_data=generate_batch(data_list), nb_val_samples=1024)
 
     print('Saving model weights and configuration file.')
 
