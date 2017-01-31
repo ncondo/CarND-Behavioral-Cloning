@@ -39,7 +39,7 @@ def telemetry(sid, data):
     image = Image.open(BytesIO(base64.b64decode(imgString)))
     image_array = np.asarray(image)
     # Convert image to HSV color space as done in training model
-    image_array = cv2.cvtColor(image_array, cv2.COLOR_RGB2HSV)
+    #image_array = cv2.cvtColor(image_array, cv2.COLOR_RGB2HSV)
     # Crop and resize image to preserve same shape as training
     image_array = image_array[60:-20,:]
     image_array = cv2.resize(image_array, (200, 66), interpolation=cv2.INTER_AREA)
