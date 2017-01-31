@@ -25,9 +25,44 @@ def get_csv_data(training_file):
         reader = csv.reader(f)
         next(reader, None) # skip header
         data_list = list(reader)
+        image_names = []
+        steering_angles = []
+        OFFSET = 0.2
+        for row in data_list:
+            # Get recorded steering angle for center image and apply offset to get left/right angles
+            center_angle = float(row[3])
+            left_angle = center_angle + OFFSET
+            right_angle = center_angle - OFFSET
+            # Append center image name and related steering angle to lists
+            image_names.append(str(row[0]).strip())
+            steering_angles.append(center_angle)
+            # Append left image name and related steering angle to lists
+            image_names.append(str(row[1]).strip())
+            steering_angles.append(left_angle)
+            # Append right image name and related steering angle to lists
+            image_names.append(str(row[2]).strip())
+            steering_angles.append(right_angle)
+
     f.close()
 
-    return data_list
+    return image_names, steering_angles
+
+
+def generate_batch_2(X_train, y_train, batch_size=64):
+    image_names = X_train
+    steering_angles = y_train
+    images = np.zeros((batch_size, 160, 320, 3), dtype=np.float32)
+    angles = np.zeros((batch_size,), dtype=np.float32)
+    while 1:
+        for i in range(0, len(image_names), batch_size):
+            for j in range(batch_size):
+                image = Image.open('data/' + image_names[i+j])
+                image = np.array(image, dtype=np.float32)
+                image = random_brightness(image)
+                images[j] = image
+                angles[j] = steering_angles[i+j]
+            yield images, angles
+
 
 
 def generate_batch(data_list, batch_size=64):
@@ -117,10 +152,10 @@ if __name__=="__main__":
 
     training_file = 'data/driving_log.csv'
 
-    data_list = get_csv_data(training_file)
+    X_train, y_train = get_csv_data(training_file)
 
     model = get_model()
-    model.fit_generator(generate_batch(data_list), samples_per_epoch=10240, nb_epoch=40, validation_data=generate_batch(data_list), nb_val_samples=1024)
+    model.fit_generator(generate_batch_2(X_train, y_train), samples_per_epoch=28416, nb_epoch=40, validation_data=generate_batch_2(X_train, y_train), nb_val_samples=1024)
 
     print('Saving model weights and configuration file.')
 
