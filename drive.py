@@ -40,6 +40,9 @@ def telemetry(sid, data):
     image_array = np.asarray(image)
     # Convert image to HSV color space as done in training model
     image_array = cv2.cvtColor(image_array, cv2.COLOR_RGB2HSV)
+    # Crop and resize image to preserve same shape as training
+    image_array = image_array[60:-20,:]
+    image_array = cv2.resize(image_array, (200, 66), interpolation=cv2.INTER_AREA)
     transformed_image_array = image_array[None, :, :, :]
     # This model currently assumes that the features of the model are just the images. Feel free to change this.
     steering_angle = float(model.predict(transformed_image_array, batch_size=1))

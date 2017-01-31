@@ -77,7 +77,7 @@ def generate_batch_2(X_train, y_train, batch_size=64):
 
 
 def generate_batch(data_list, batch_size=64):
-    images = np.zeros((batch_size, 160, 320, 3), dtype=np.float32)
+    images = np.zeros((batch_size, 66, 200, 3), dtype=np.float32)
     angles = np.zeros((batch_size,), dtype=np.float32)
     OFFSETS = [0, .2, -.2]
     while 1:
@@ -86,15 +86,16 @@ def generate_batch(data_list, batch_size=64):
             image_choice = random.randrange(len(OFFSETS))
             image = Image.open('data/' + str(data_list[row][image_choice]).strip())
             image = np.array(image, dtype=np.float32)
-            image = random_brightness(image)
+            #image = random_brightness(image)
+            image = process_image(image)
             images[i] = image
             angles[i] = float(data_list[row][3]) + OFFSETS[image_choice]
         yield images, angles
 
 
 def resize(image):
-    import tensorflow as tf
-    return tf.image.resize_images(image, (66, 200))
+    return cv2.resize(image, (200, 66), interpolation=cv2.INTER_AREA)
+    #tf.image.resize_images(image, (66, 200))
 
 
 def normalize(image):
@@ -102,7 +103,7 @@ def normalize(image):
 
 
 def crop_image(image):
-    return image[:, :, 60:-20, :]
+    return image[60:-20,:]
 
 
 def random_brightness(image):
@@ -113,15 +114,22 @@ def random_brightness(image):
     return bright_image
 
 
+def process_image(image):
+    image = random_brightness(image)
+    image = crop_image(image)
+    image = resize(image)
+    return image
+
+
 def get_model():
 
     model = Sequential([
         #Crop area above image and car hood
-        Lambda(crop_image, input_shape=(160, 320, 3)),
+        #Lambda(crop_image, input_shape=(160, 320, 3)),
         # Resize image to 66X200X3
-        Lambda(resize),
+        #Lambda(resize),
         # Normalize image to -1.0 to 1.0
-        Lambda(normalize),
+        Lambda(normalize, input_shape=(66, 200, 3)),
         # Convolutional layer 1 24@31x98 | 5x5 kernel | 2x2 stride | relu activation 
         Convolution2D(24, 5, 5, border_mode='valid', activation='relu', subsample=(2, 2), init='he_normal'),
         # Convolutional layer 2 36@14x47 | 5x5 kernel | 2x2 stride | relu activation
