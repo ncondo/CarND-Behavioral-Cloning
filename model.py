@@ -51,9 +51,9 @@ def get_csv_data(training_file):
 def generate_batch_2(X_train, y_train, batch_size=64):
     image_names = X_train
     steering_angles = y_train
-    images = np.zeros((batch_size, 160, 320, 3), dtype=np.float32)
-    angles = np.zeros((batch_size,), dtype=np.float32)
     while 1:
+        images = np.zeros((batch_size, 160, 320, 3), dtype=np.float32)
+        angles = np.zeros((batch_size,), dtype=np.float32)
         for i in range(0, len(image_names), batch_size):
             for j in range(batch_size):
                 image = Image.open('data/' + image_names[i+j])
