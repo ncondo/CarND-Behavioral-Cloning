@@ -48,13 +48,13 @@ def get_csv_data(training_file):
     return image_names, steering_angles
 
 
-def generate_batch_2(X_train, y_train, batch_size=64):
+def generate_batch_2(X_train, y_train, samples_per_epoch, batch_size=64):
     image_names = X_train
     steering_angles = y_train
     while 1:
         images = np.zeros((batch_size, 160, 320, 3), dtype=np.float32)
         angles = np.zeros((batch_size,), dtype=np.float32)
-        for i in range(0, len(image_names), batch_size):
+        for i in range(0, samples_per_epoch, batch_size):
             for j in range(batch_size):
                 image = Image.open('data/' + image_names[i+j])
                 image = np.array(image, dtype=np.float32)
@@ -155,7 +155,7 @@ if __name__=="__main__":
     X_train, y_train = get_csv_data(training_file)
 
     model = get_model()
-    model.fit_generator(generate_batch_2(X_train, y_train), samples_per_epoch=28426, nb_epoch=40)#, validation_data=generate_batch_2(X_train, y_train), nb_val_samples=1024)
+    model.fit_generator(generate_batch_2(X_train, y_train, samples_per_epoch), samples_per_epoch=28426, nb_epoch=40)#, validation_data=generate_batch_2(X_train, y_train), nb_val_samples=1024)
 
     print('Saving model weights and configuration file.')
 
