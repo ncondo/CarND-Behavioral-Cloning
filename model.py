@@ -109,7 +109,7 @@ def normalize(image):
 
 
 def crop_image(image):
-    return image[60:-20,:]
+    return image[40:-20,:]
 
 
 def random_brightness(image):
