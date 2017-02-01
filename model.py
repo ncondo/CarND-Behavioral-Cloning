@@ -1,6 +1,8 @@
 import tensorflow as tf
 import numpy as np
 from PIL import Image
+from sklearn.utils import shuffle
+import math
 import random
 import csv
 import cv2
@@ -179,9 +181,12 @@ if __name__=="__main__":
 
     #X_train, y_train = get_csv_data(training_file)
     data_list = get_csv_data(training_file)
+    data_list = shuffle(data_list)
+    training_list = data_list[:math.floor(len(data_list)*.8)]
+    validation_list = data_list[math.floor(len(data_list)*.8):]
 
     model = get_model()
-    model.fit_generator(generate_batch(data_list), samples_per_epoch=24000, nb_epoch=20, validation_data=generate_batch(data_list), nb_val_samples=1024)
+    model.fit_generator(generate_batch(training_list), samples_per_epoch=24000, nb_epoch=20, validation_data=generate_batch(validation_list), nb_val_samples=1024)
 
     print('Saving model weights and configuration file.')
 
