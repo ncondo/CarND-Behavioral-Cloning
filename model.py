@@ -209,14 +209,12 @@ if __name__=="__main__":
 
 
     print('Saving model weights and configuration file.')
-    """
-    model.save_weights('model.h5')
-    with open('model.h5', 'r') as f:
-        best_model = f.read()
+    
+    #model.save_weights('model.h5')
     with open('model.json', 'w') as outfile:
         json.dump(model.to_json(), outfile)
-    """
-    
+
+
     json_file = open('model.json', 'r')
     loaded_model_json = json_file.read()
     json_file.close()
