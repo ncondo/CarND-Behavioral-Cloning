@@ -139,8 +139,8 @@ if __name__=="__main__":
 
     # Get the Udacity provided training data from file and save it in a list
     training_file = 'data/driving_log.csv'
-    # NOTE: To use student generated dataset with over 100k examples uncomment below line
-    training_file = 'data/session_data/driving_log.csv'
+    # NOTE: To train using student generated dataset with over 100k examples uncomment below line
+    # training_file = 'data/session_data/driving_log.csv'
     data_list = get_csv_data(training_file)
     # Shuffle the data and split into train and validation sets
     data_list = shuffle(data_list)
@@ -148,10 +148,10 @@ if __name__=="__main__":
     validation_list = data_list[math.floor(len(data_list)*.9):]
 
     # Stop training if the validation loss doesn't improve for 5 consecutive epochs
-    early_stop = callbacks.EarlyStopping(monitor='val_loss', min_delta=0, patience=5, verbose=0, mode='auto')
+    # early_stop = callbacks.EarlyStopping(monitor='val_loss', min_delta=0, patience=5, verbose=0, mode='auto')
     # Get model and train using fit generator due to memory constraints
     model = get_model()
-    model.fit_generator(generate_batch(training_list), samples_per_epoch=24000, nb_epoch=200, validation_data=generate_batch(validation_list), nb_val_samples=1024, callbacks=[early_stop])
+    model.fit_generator(generate_batch(training_list), samples_per_epoch=24000, nb_epoch=50, validation_data=generate_batch(validation_list), nb_val_samples=1024) #, callbacks=[early_stop])
 
     print('Saving model weights and configuration file.')
     # Save model weights
