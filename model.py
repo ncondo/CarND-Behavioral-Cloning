@@ -153,15 +153,15 @@ def get_model():
         # Dropout with keep probability of .2
         Dropout(.2),
         # Fully-connected layer 1 | 100 neurons
-        Dense(100, activation='elu', init='he_normal', W_regularizer=l2(0.005)),
+        Dense(100, activation='elu', init='he_normal', W_regularizer=l2(0.001)),
         # Dropout with keep probability of .5
         Dropout(.5),
         # Fully-connected layer 2 | 50 neurons
-        Dense(50, activation='elu', init='he_normal', W_regularizer=l2(0.005)),
+        Dense(50, activation='elu', init='he_normal', W_regularizer=l2(0.001)),
         # Dropout with keep probability of .5
         Dropout(.5),
         # Fully-connected layer 3 | 10 neurons
-        Dense(10, activation='elu', init='he_normal', W_regularizer=l2(0.005)),
+        Dense(10, activation='elu', init='he_normal', W_regularizer=l2(0.001)),
         # Dropout with keep probability of .5
         Dropout(.5),
         # Output
