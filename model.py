@@ -84,6 +84,7 @@ def generate_batch(data_list, batch_size=64):
     OFFSETS = [0, .2, -.2]
     while 1:
         for i in range(batch_size):
+            data_list = shuffle(data_list)
             row = random.randrange(len(data_list))
             image_index = random.randrange(len(OFFSETS))
             #image = Image.open('data/' + str(data_list[row][image_choice]).strip())
