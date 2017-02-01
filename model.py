@@ -136,26 +136,26 @@ def get_model():
         # Normalize image to -1.0 to 1.0
         Lambda(normalize, input_shape=(66, 200, 3)),
         # Convolutional layer 1 24@31x98 | 5x5 kernel | 2x2 stride | relu activation 
-        Convolution2D(24, 5, 5, border_mode='valid', activation='elu', subsample=(2, 2), init='he_normal', W_regularizer=l2(0.001)),
+        Convolution2D(24, 5, 5, border_mode='valid', activation='elu', subsample=(2, 2), init='he_normal'),# W_regularizer=l2(0.001)),
         # Dropout with drop probability of .1 (keep probability of .9)
         Dropout(.1),
         # Convolutional layer 2 36@14x47 | 5x5 kernel | 2x2 stride | relu activation
-        Convolution2D(36, 5, 5, border_mode='valid', activation='elu', subsample=(2, 2), init='he_normal', W_regularizer=l2(0.001)),
+        Convolution2D(36, 5, 5, border_mode='valid', activation='elu', subsample=(2, 2), init='he_normal'),# W_regularizer=l2(0.001)),
         # Dropout with drop probability of .2 (keep probability of .8)
         Dropout(.2),
         # Convolutional layer 3 48@5x22  | 5x5 kernel | 2x2 stride | relu activation
-        Convolution2D(48, 5, 5, border_mode='valid', activation='elu', subsample=(2, 2), init='he_normal', W_regularizer=l2(0.001)),
+        Convolution2D(48, 5, 5, border_mode='valid', activation='elu', subsample=(2, 2), init='he_normal'),# W_regularizer=l2(0.001)),
         # Dropout with drop probability of .2 (keep probability of .8)
         Dropout(.2),
         # Convolutional layer 4 64@3x20  | 3x3 kernel | 1x1 stride | relu activation
-        Convolution2D(64, 3, 3, border_mode='valid', activation='elu', subsample=(1, 1), init='he_normal', W_regularizer=l2(0.001)),
+        Convolution2D(64, 3, 3, border_mode='valid', activation='elu', subsample=(1, 1), init='he_normal'),# W_regularizer=l2(0.001)),
         # Dropout with drop probability of .2 (keep probability of .8)
         Dropout(.2),
         # Convolutional layer 5 64@1x18  | 3x3 kernel | 1x1 stride | relu activation
-        Convolution2D(64, 3, 3, border_mode='valid', activation='elu', subsample=(1, 1), init='he_normal', W_regularizer=l2(0.001)),
+        Convolution2D(64, 3, 3, border_mode='valid', activation='elu', subsample=(1, 1), init='he_normal'),# W_regularizer=l2(0.001)),
         # Flatten
         Flatten(),
-        # Dropout with drop probability of .2 (keep probability of .8)
+        # Dropout with drop probability of .3 (keep probability of .7)
         Dropout(.3),
         # Fully-connected layer 1 | 100 neurons
         Dense(100, activation='elu', init='he_normal', W_regularizer=l2(0.001)),
@@ -182,25 +182,24 @@ def get_model():
 
 if __name__=="__main__":
 
+    # Get the training data from file and save it in a list
     training_file = 'data/driving_log.csv'
-
-    #X_train, y_train = get_csv_data(training_file)
     data_list = get_csv_data(training_file)
+    # Shuffle the data and split into train and validation sets
     data_list = shuffle(data_list)
     training_list = data_list[:math.floor(len(data_list)*.8)]
     validation_list = data_list[math.floor(len(data_list)*.8):]
 
-    model = get_model()
     # Stop training if the validation loss doesn't improve for 5 consecutive epochs
     early_stop = callbacks.EarlyStopping(monitor='val_loss', min_delta=0, patience=5, verbose=0, mode='auto')
-
+    # Get model and train using fit generator due to memory constraints
+    model = get_model()
     model.fit_generator(generate_batch(training_list), samples_per_epoch=24000, nb_epoch=200, validation_data=generate_batch(validation_list), nb_val_samples=1024, callbacks=[early_stop])
 
-
     print('Saving model weights and configuration file.')
-    
+    # Save model weights
     model.save_weights('model.h5')
-
+    # Save model configuration as json file
     with open('model.json', 'w') as outfile:
         json.dump(model.to_json(), outfile)
 
