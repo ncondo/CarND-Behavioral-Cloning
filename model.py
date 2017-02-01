@@ -17,7 +17,8 @@ from keras.regularizers import l2
 from keras import callbacks
 
 
-def get_csv_data_2(training_file):
+
+def get_csv_data(training_file):
     """
     Utility function to load training data from a csv file and
     return data as a python list.
@@ -26,56 +27,12 @@ def get_csv_data_2(training_file):
     """
     with open(training_file, 'r') as f:
         reader = csv.reader(f)
-        next(reader, None) # skip header
-        data_list = list(reader)
-        image_names = []
-        steering_angles = []
-        OFFSET = 0.2
-        for row in data_list:
-            # Get recorded steering angle for center image and apply offset to get left/right angles
-            center_angle = float(row[3])
-            left_angle = center_angle + OFFSET
-            right_angle = center_angle - OFFSET
-            # Append center image name and related steering angle to lists
-            image_names.append(str(row[0]).strip())
-            steering_angles.append(center_angle)
-            # Append left image name and related steering angle to lists
-            image_names.append(str(row[1]).strip())
-            steering_angles.append(left_angle)
-            # Append right image name and related steering angle to lists
-            image_names.append(str(row[2]).strip())
-            steering_angles.append(right_angle)
-
-    f.close()
-
-    return image_names, steering_angles
-
-
-def get_csv_data(training_file):
-    with open(training_file, 'r') as f:
-        reader = csv.reader(f)
         next(reader, None)
         data_list = list(reader)
 
     f.close()
 
     return data_list
-
-
-def generate_batch_2(X_train, y_train, batch_size=64):
-    images = np.zeros((batch_size, 160, 320, 3), dtype=np.float32)
-    angles = np.zeros((batch_size,), dtype=np.float32)
-    while 1:
-        shuffled = list(zip(X_train, y_train))
-        random.shuffle(shuffled)
-        X_train, y_train = zip(*shuffled)
-        for i in range(batch_size):
-            image = Image.open('data/' + X_train[i])
-            image = np.array(image, dtype=np.float32)
-            image = random_brightness(image)
-            images[i] = image
-            angles[i] = y_train[i]
-        yield images, angles
 
 
 
@@ -87,7 +44,6 @@ def generate_batch(data_list, batch_size=64):
         for i in range(batch_size):
             row = random.randrange(len(data_list))
             image_index = random.randrange(len(OFFSETS))
-            #image = Image.open('data/' + str(data_list[row][image_choice]).strip())
             image = cv2.imread('data/' + str(data_list[row][image_index]).strip())
             image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
             image = process_image(image)
@@ -104,7 +60,6 @@ def generate_batch(data_list, batch_size=64):
 
 def resize(image):
     return cv2.resize(image, (200, 66), interpolation=cv2.INTER_AREA)
-    #tf.image.resize_images(image, (66, 200))
 
 
 def normalize(image):
@@ -135,37 +90,37 @@ def get_model():
     model = Sequential([
         # Normalize image to -1.0 to 1.0
         Lambda(normalize, input_shape=(66, 200, 3)),
-        # Convolutional layer 1 24@31x98 | 5x5 kernel | 2x2 stride | relu activation 
-        Convolution2D(24, 5, 5, border_mode='valid', activation='elu', subsample=(2, 2), init='he_normal'),# W_regularizer=l2(0.001)),
+        # Convolutional layer 1 24@31x98 | 5x5 kernel | 2x2 stride | elu activation 
+        Convolution2D(24, 5, 5, border_mode='valid', activation='elu', subsample=(2, 2), init='he_normal', W_regularizer=l2(0.001)),
         # Dropout with drop probability of .1 (keep probability of .9)
         Dropout(.1),
-        # Convolutional layer 2 36@14x47 | 5x5 kernel | 2x2 stride | relu activation
-        Convolution2D(36, 5, 5, border_mode='valid', activation='elu', subsample=(2, 2), init='he_normal'),# W_regularizer=l2(0.001)),
+        # Convolutional layer 2 36@14x47 | 5x5 kernel | 2x2 stride | elu activation
+        Convolution2D(36, 5, 5, border_mode='valid', activation='elu', subsample=(2, 2), init='he_normal', W_regularizer=l2(0.001)),
         # Dropout with drop probability of .2 (keep probability of .8)
         Dropout(.2),
-        # Convolutional layer 3 48@5x22  | 5x5 kernel | 2x2 stride | relu activation
-        Convolution2D(48, 5, 5, border_mode='valid', activation='elu', subsample=(2, 2), init='he_normal'),# W_regularizer=l2(0.001)),
+        # Convolutional layer 3 48@5x22  | 5x5 kernel | 2x2 stride | elu activation
+        Convolution2D(48, 5, 5, border_mode='valid', activation='elu', subsample=(2, 2), init='he_normal', W_regularizer=l2(0.001)),
         # Dropout with drop probability of .2 (keep probability of .8)
         Dropout(.2),
-        # Convolutional layer 4 64@3x20  | 3x3 kernel | 1x1 stride | relu activation
-        Convolution2D(64, 3, 3, border_mode='valid', activation='elu', subsample=(1, 1), init='he_normal'),# W_regularizer=l2(0.001)),
+        # Convolutional layer 4 64@3x20  | 3x3 kernel | 1x1 stride | elu activation
+        Convolution2D(64, 3, 3, border_mode='valid', activation='elu', subsample=(1, 1), init='he_normal', W_regularizer=l2(0.001)),
         # Dropout with drop probability of .2 (keep probability of .8)
         Dropout(.2),
-        # Convolutional layer 5 64@1x18  | 3x3 kernel | 1x1 stride | relu activation
-        Convolution2D(64, 3, 3, border_mode='valid', activation='elu', subsample=(1, 1), init='he_normal'),# W_regularizer=l2(0.001)),
+        # Convolutional layer 5 64@1x18  | 3x3 kernel | 1x1 stride | elu activation
+        Convolution2D(64, 3, 3, border_mode='valid', activation='elu', subsample=(1, 1), init='he_normal', W_regularizer=l2(0.001)),
         # Flatten
         Flatten(),
-        # Dropout with drop probability of .3 (keep probability of .7)
-        Dropout(.3),
-        # Fully-connected layer 1 | 100 neurons
+        # Dropout with drop probability of .2 (keep probability of .8)
+        Dropout(.2),
+        # Fully-connected layer 1 | 100 neurons | elu activation
         Dense(100, activation='elu', init='he_normal', W_regularizer=l2(0.001)),
         # Dropout with drop probability of .5
         Dropout(.5),
-        # Fully-connected layer 2 | 50 neurons
+        # Fully-connected layer 2 | 50 neurons | elu activation
         Dense(50, activation='elu', init='he_normal', W_regularizer=l2(0.001)),
         # Dropout with drop probability of .5
         Dropout(.5),
-        # Fully-connected layer 3 | 10 neurons
+        # Fully-connected layer 3 | 10 neurons | elu activation
         Dense(10, activation='elu', init='he_normal', W_regularizer=l2(0.001)),
         # Dropout with drop probability of .5
         Dropout(.5),
