@@ -205,7 +205,7 @@ if __name__=="__main__":
     # Save callbacks in a list to pass to fit_generator
     callbacks_list = [save_best, early_stop]
 
-    model.fit_generator(generate_batch(training_list), samples_per_epoch=24000, nb_epoch=200, validation_data=generate_batch(validation_list), nb_val_samples=1024, callbacks=[callbacks_list])
+    model.fit_generator(generate_batch(training_list), samples_per_epoch=24000, nb_epoch=200, validation_data=generate_batch(validation_list), nb_val_samples=1024, callbacks=callbacks_list)
 
     """
     print('Saving model weights and configuration file.')
