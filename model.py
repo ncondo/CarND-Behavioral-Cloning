@@ -212,7 +212,7 @@ if __name__=="__main__":
 
     #model.save_weights('model.h5')
     with open('model.h5', 'r') as f:
-        best_model = read(f)
+        best_model = f.read()
         with open('model.json', 'w') as outfile:
             json.dump(best_model.to_json(), outfile)
 
