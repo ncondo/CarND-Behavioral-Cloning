@@ -186,7 +186,7 @@ if __name__=="__main__":
     validation_list = data_list[math.floor(len(data_list)*.8):]
 
     model = get_model()
-    model.fit_generator(generate_batch(training_list), samples_per_epoch=24000, nb_epoch=20, validation_data=generate_batch(validation_list), nb_val_samples=1024)
+    model.fit_generator(generate_batch(training_list), samples_per_epoch=24000, nb_epoch=40, validation_data=generate_batch(validation_list), nb_val_samples=1024)
 
     print('Saving model weights and configuration file.')
 
