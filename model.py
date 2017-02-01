@@ -197,32 +197,20 @@ if __name__=="__main__":
     validation_list = data_list[math.floor(len(data_list)*.8):]
 
     model = get_model()
-    model_path = 'model.h5'
-    # Save the model after each epoch if the validation loss improved
-    save_best = callbacks.ModelCheckpoint(model_path, monitor='val_loss', verbose=1, save_best_only=True, mode='min')
     # Stop training if the validation loss doesn't improve for 5 consecutive epochs
     early_stop = callbacks.EarlyStopping(monitor='val_loss', min_delta=0, patience=5, verbose=0, mode='auto')
     # Save callbacks in a list to pass to fit_generator
-    callbacks_list = [save_best, early_stop]
+    callbacks_list = [early_stop]
 
-    model.fit_generator(generate_batch(training_list), samples_per_epoch=24000, nb_epoch=1, validation_data=generate_batch(validation_list), nb_val_samples=1024, callbacks=callbacks_list)
+    model.fit_generator(generate_batch(training_list), samples_per_epoch=24000, nb_epoch=200, validation_data=generate_batch(validation_list), nb_val_samples=1024, callbacks=callbacks_list)
 
 
     print('Saving model weights and configuration file.')
     
-    #model.save_weights('model.h5')
+    model.save_weights('model.h5')
+
     with open('model.json', 'w') as outfile:
         json.dump(model.to_json(), outfile)
-
-
-    json_file = open('model.json', 'r')
-    loaded_model_json = json_file.read()
-    json_file.close()
-    loaded_model = model_from_json(loaded_model_json)
-    loaded_model.load_weights('model.h5')
-
-    with open('best_model.json', 'w') as outfile:
-        json.dump(loaded_model.to_json(), outfile)
 
 
     from keras import backend as K 
