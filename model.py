@@ -111,7 +111,7 @@ def get_model():
         # Flatten
         Flatten(),
         # Dropout with drop probability of .2 (keep probability of .8)
-        Dropout(.2),
+        Dropout(.3),
         # Fully-connected layer 1 | 100 neurons | elu activation
         Dense(100, activation='elu', init='he_normal', W_regularizer=l2(0.001)),
         # Dropout with drop probability of .5
@@ -137,13 +137,15 @@ def get_model():
 
 if __name__=="__main__":
 
-    # Get the training data from file and save it in a list
+    # Get the Udacity provided training data from file and save it in a list
     training_file = 'data/driving_log.csv'
+    # NOTE: To use student generated dataset with over 100k examples uncomment below line
+    training_file = 'data/session_data/driving_log.csv'
     data_list = get_csv_data(training_file)
     # Shuffle the data and split into train and validation sets
     data_list = shuffle(data_list)
-    training_list = data_list[:math.floor(len(data_list)*.8)]
-    validation_list = data_list[math.floor(len(data_list)*.8):]
+    training_list = data_list[:math.floor(len(data_list)*.9)]
+    validation_list = data_list[math.floor(len(data_list)*.9):]
 
     # Stop training if the validation loss doesn't improve for 5 consecutive epochs
     early_stop = callbacks.EarlyStopping(monitor='val_loss', min_delta=0, patience=5, verbose=0, mode='auto')
@@ -154,7 +156,7 @@ if __name__=="__main__":
     print('Saving model weights and configuration file.')
     # Save model weights
     model.save_weights('model.h5')
-    # Save model configuration as json file
+    # Save model architecture as json file
     with open('model.json', 'w') as outfile:
         json.dump(model.to_json(), outfile)
 
