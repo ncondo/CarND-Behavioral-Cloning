@@ -209,12 +209,23 @@ if __name__=="__main__":
 
 
     print('Saving model weights and configuration file.')
-
-    #model.save_weights('model.h5')
+    """
+    model.save_weights('model.h5')
     with open('model.h5', 'r') as f:
         best_model = f.read()
-        with open('model.json', 'w') as outfile:
-            json.dump(best_model.to_json(), outfile)
+    with open('model.json', 'w') as outfile:
+        json.dump(model.to_json(), outfile)
+    """
+    
+    json_file = open('model.json', 'r')
+    loaded_model_json = json_file.read()
+    json_file.close()
+    loaded_model = model_from_json(loaded_model_json)
+    loaded_model.load_weights('model.h5')
+
+    with open('best_model.json', 'w') as outfile:
+        json.dump(loaded_model.to_json(), outfile)
+
 
     from keras import backend as K 
 
