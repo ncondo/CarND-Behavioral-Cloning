@@ -39,7 +39,7 @@ def get_csv_data(training_file):
 def generate_batch(data_list, batch_size=64):
     images = np.zeros((batch_size, 66, 200, 3), dtype=np.float32)
     angles = np.zeros((batch_size,), dtype=np.float32)
-    OFFSETS = [0, .2, -.2]
+    OFFSETS = [0, .1, -.1]
     while 1:
         for i in range(batch_size):
             row = random.randrange(len(data_list))
@@ -148,10 +148,10 @@ if __name__=="__main__":
     validation_list = data_list[math.floor(len(data_list)*.9):]
 
     # Stop training if the validation loss doesn't improve for 5 consecutive epochs
-    # early_stop = callbacks.EarlyStopping(monitor='val_loss', min_delta=0, patience=5, verbose=0, mode='auto')
+    early_stop = callbacks.EarlyStopping(monitor='val_loss', min_delta=0, patience=5, verbose=0, mode='auto')
     # Get model and train using fit generator due to memory constraints
     model = get_model()
-    model.fit_generator(generate_batch(training_list), samples_per_epoch=24000, nb_epoch=50, validation_data=generate_batch(validation_list), nb_val_samples=1024) #, callbacks=[early_stop])
+    model.fit_generator(generate_batch(training_list), samples_per_epoch=24000, nb_epoch=50, validation_data=generate_batch(validation_list), nb_val_samples=1024, callbacks=[early_stop])
 
     print('Saving model weights and configuration file.')
     # Save model weights
