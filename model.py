@@ -14,6 +14,7 @@ from keras.layers import Activation, Dense, Dropout, ELU, Flatten, Input, Lambda
 from keras.layers.convolutional import Convolution2D, Cropping2D
 from keras.models import Sequential, Model, load_model
 from keras.regularizers import l2
+from keras import callbacks
 
 
 def get_csv_data_2(training_file):
@@ -157,11 +158,11 @@ def get_model():
         # Convolutional layer 5 64@1x18  | 3x3 kernel | 1x1 stride | relu activation
         Convolution2D(64, 3, 3, border_mode='valid', activation='elu', subsample=(1, 1), init='he_normal', W_regularizer=l2(0.001)),
         # Dropout with drop probability of .2 (keep probability of .8)
-        Dropout(.2),
+        Dropout(.3),
         # Flatten
         Flatten(),
         # Dropout with drop probability of .2 (keep probability of .8)
-        Dropout(.2),
+        Dropout(.3),
         # Fully-connected layer 1 | 100 neurons
         Dense(100, activation='elu', init='he_normal', W_regularizer=l2(0.001)),
         # Dropout with drop probability of .5
@@ -196,15 +197,24 @@ if __name__=="__main__":
     validation_list = data_list[math.floor(len(data_list)*.8):]
 
     model = get_model()
-    model.fit_generator(generate_batch(training_list), samples_per_epoch=24000, nb_epoch=40, validation_data=generate_batch(validation_list), nb_val_samples=1024)
+    model_path = 'model.h5'
+    # Save the model after each epoch if the validation loss improved
+    save_best = callbacks.ModelCheckpoint(model_path, monitor='val_loss', verbose=1, save_best_only=True, mode='min')
+    # Stop training if the validation loss doesn't improve for 5 consecutive epochs
+    early_stop = callbacks.EarlyStopping(monitor='val_loss', min_delta=0, patience=5, verbose=0, mode='auto')
+    # Save callbacks in a list to pass to fit_generator
+    callbacks_list = [save_best, early_stop]
 
+    model.fit_generator(generate_batch(training_list), samples_per_epoch=24000, nb_epoch=200, validation_data=generate_batch(validation_list), nb_val_samples=1024, callbacks=[callbacks_list])
+
+    """
     print('Saving model weights and configuration file.')
 
     model.save_weights('model.h5')
 
     with open('model.json', 'w') as outfile:
         json.dump(model.to_json(), outfile)
-
+    """
     from keras import backend as K 
 
     K.clear_session()
