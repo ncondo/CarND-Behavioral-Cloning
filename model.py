@@ -139,15 +139,15 @@ def get_model():
         # Normalize image to -1.0 to 1.0
         Lambda(normalize, input_shape=(66, 200, 3)),
         # Convolutional layer 1 24@31x98 | 5x5 kernel | 2x2 stride | relu activation 
-        Convolution2D(24, 5, 5, border_mode='valid', activation='elu', subsample=(2, 2), init='he_normal', W_regularizer=l2(0.005)),
+        Convolution2D(24, 5, 5, border_mode='valid', activation='elu', subsample=(2, 2), init='he_normal'),
         # Convolutional layer 2 36@14x47 | 5x5 kernel | 2x2 stride | relu activation
-        Convolution2D(36, 5, 5, border_mode='valid', activation='elu', subsample=(2, 2), init='he_normal', W_regularizer=l2(0.005)),
+        Convolution2D(36, 5, 5, border_mode='valid', activation='elu', subsample=(2, 2), init='he_normal'),
         # Convolutional layer 3 48@5x22  | 5x5 kernel | 2x2 stride | relu activation
-        Convolution2D(48, 5, 5, border_mode='valid', activation='elu', subsample=(2, 2), init='he_normal', W_regularizer=l2(0.005)),
+        Convolution2D(48, 5, 5, border_mode='valid', activation='elu', subsample=(2, 2), init='he_normal'),
         # Convolutional layer 4 64@3x20  | 3x3 kernel | 1x1 stride | relu activation
-        Convolution2D(64, 3, 3, border_mode='valid', activation='elu', subsample=(1, 1), init='he_normal', W_regularizer=l2(0.005)),
+        Convolution2D(64, 3, 3, border_mode='valid', activation='elu', subsample=(1, 1), init='he_normal'),
         # Convolutional layer 5 64@1x18  | 3x3 kernel | 1x1 stride | relu activation
-        Convolution2D(64, 3, 3, border_mode='valid', activation='elu', subsample=(1, 1), init='he_normal', W_regularizer=l2(0.005)),
+        Convolution2D(64, 3, 3, border_mode='valid', activation='elu', subsample=(1, 1), init='he_normal'),
         # Flatten
         Flatten(),
         # Dropout with keep probability of .2
