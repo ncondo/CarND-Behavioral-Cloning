@@ -133,10 +133,6 @@ def process_image(image):
 def get_model():
 
     model = Sequential([
-        #Crop area above image and car hood
-        #Lambda(crop_image, input_shape=(160, 320, 3)),
-        # Resize image to 66X200X3
-        #Lambda(resize),
         # Normalize image to -1.0 to 1.0
         Lambda(normalize, input_shape=(66, 200, 3)),
         # Convolutional layer 1 24@31x98 | 5x5 kernel | 2x2 stride | relu activation 
@@ -157,8 +153,6 @@ def get_model():
         Dropout(.2),
         # Convolutional layer 5 64@1x18  | 3x3 kernel | 1x1 stride | relu activation
         Convolution2D(64, 3, 3, border_mode='valid', activation='elu', subsample=(1, 1), init='he_normal', W_regularizer=l2(0.001)),
-        # Dropout with drop probability of .2 (keep probability of .8)
-        Dropout(.3),
         # Flatten
         Flatten(),
         # Dropout with drop probability of .2 (keep probability of .8)
@@ -199,10 +193,8 @@ if __name__=="__main__":
     model = get_model()
     # Stop training if the validation loss doesn't improve for 5 consecutive epochs
     early_stop = callbacks.EarlyStopping(monitor='val_loss', min_delta=0, patience=5, verbose=0, mode='auto')
-    # Save callbacks in a list to pass to fit_generator
-    callbacks_list = [early_stop]
 
-    model.fit_generator(generate_batch(training_list), samples_per_epoch=24000, nb_epoch=200, validation_data=generate_batch(validation_list), nb_val_samples=1024, callbacks=callbacks_list)
+    model.fit_generator(generate_batch(training_list), samples_per_epoch=24000, nb_epoch=200, validation_data=generate_batch(validation_list), nb_val_samples=1024, callbacks=[early_stop])
 
 
     print('Saving model weights and configuration file.')
