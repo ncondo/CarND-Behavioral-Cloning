@@ -39,7 +39,7 @@ def get_csv_data(training_file):
 def generate_batch(data_list, batch_size=64):
     images = np.zeros((batch_size, 66, 200, 3), dtype=np.float32)
     angles = np.zeros((batch_size,), dtype=np.float32)
-    OFFSETS = [0, .2, -.2]
+    OFFSETS = [0, .1, -.1]
     while 1:
         straight_count = 0
         for i in range(batch_size):
