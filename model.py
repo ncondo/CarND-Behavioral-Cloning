@@ -14,6 +14,7 @@ from keras.layers import Activation, Dense, Dropout, ELU, Flatten, Input, Lambda
 from keras.layers.convolutional import Convolution2D, Cropping2D
 from keras.models import Sequential, Model, load_model, model_from_json
 from keras.regularizers import l2
+from keras.optimizers import Adam
 from keras import callbacks
 
 
