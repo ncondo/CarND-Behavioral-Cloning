@@ -2,6 +2,7 @@ import tensorflow as tf
 import numpy as np
 from PIL import Image
 from sklearn.utils import shuffle
+from sklearn.model_selection import train_test_split
 import math
 import random
 import csv
@@ -18,7 +19,7 @@ from keras import callbacks
 
 
 
-def get_csv_data(training_file):
+def get_csv_data(log_file):
     """
     Utility function to load training data from a csv file and
     return data as a python list.
@@ -33,6 +34,45 @@ def get_csv_data(training_file):
     f.close()
 
     return data_list
+
+
+def get_csv_data2(log_file):
+    image_names, steering_angles = [], []
+    steering_offset = 0.25
+    with open(log_file, 'r') as f:
+        reader = csv.reader(f)
+        next(reader, None)
+        for center_img, left_img, right_img, center_angle, _, _, _ in reader:
+            angle = float(center_angle)
+            if abs(angle) > 0.1:
+                image_names.append(center_img.strip())
+                steering_angles.append(angle)
+            image_names.append(left_img.strip())
+            steering_angles.append(angle + steering_offset)
+            image_names.append(right_img.strip())
+            steering_angles.append(angle - steering_offset)
+
+    return image_names, steering_angles
+
+
+def generate_batch2(X_train, y_train, batch_size=64):
+    images = np.zeros((batch_size, 66, 200, 3), dtype=np.float32)
+    angles = np.zeros((batch_size,), dtype=np.float32)
+    while True:
+        for i in range(batch_size):
+            sample_index = random.randrange(len(X_train))
+            image = cv2.imread('data/' + str(X_train[sample_index]))
+            image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+            image = process_image(image)
+            image = np.array(image, dtype=np.float32)
+            angle = y_train[sample_index]
+            # Flip image and apply opposite angle 50% of the time
+            if random.randrange(2) == 1:
+                image = cv2.flip(image, 1)
+                angle = -angle
+            images[i] = image
+            angles[i] = angle
+        yield images, angles
 
 
 
@@ -162,20 +202,23 @@ def get_model():
 if __name__=="__main__":
 
     # Get the Udacity provided training data from file and save it in a list
-    training_file = 'data/driving_log.csv'
-    # NOTE: To train using student generated dataset with over 100k examples uncomment below line
-    # training_file = 'data/session_data/driving_log.csv'
-    data_list = get_csv_data(training_file)
+    log_file = 'data/driving_log.csv'
+    
+    #data_list = get_csv_data(log_file)
     # Shuffle the data and split into train and validation sets
-    data_list = shuffle(data_list)
-    training_list = data_list[:math.floor(len(data_list)*.9)]
-    validation_list = data_list[math.floor(len(data_list)*.9):]
+    #data_list = shuffle(data_list)
+    #training_list = data_list[:math.floor(len(data_list)*.9)]
+    #validation_list = data_list[math.floor(len(data_list)*.9):]
+
+    X_train, y_train = get_csv_data2(log_file)
+    X_train, y_train = shuffle(X_train, y_train, random_state=42)
+    X_train, X_validation, y_train, y_validation = train_test_split(X_train, y_train, test_size=0.2, random_state=42)
 
     # Stop training if the validation loss doesn't improve for 5 consecutive epochs
     # early_stop = callbacks.EarlyStopping(monitor='val_loss', min_delta=0, patience=5, verbose=0, mode='auto')
     # Get model and train using fit generator due to memory constraints
     model = get_model()
-    model.fit_generator(generate_batch(training_list), samples_per_epoch=24000, nb_epoch=40, validation_data=generate_batch(validation_list), nb_val_samples=1024)#, callbacks=[early_stop])
+    model.fit_generator(generate_batch2(X_train, y_train), samples_per_epoch=24000, nb_epoch=40, validation_data=generate_batch2(X_validation, y_validation), nb_val_samples=1024)#, callbacks=[early_stop])
 
     print('Saving model weights and configuration file.')
     # Save model weights
