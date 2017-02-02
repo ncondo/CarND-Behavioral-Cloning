@@ -43,11 +43,10 @@ def get_csv_data2(log_file):
     with open(log_file, 'r') as f:
         reader = csv.reader(f)
         next(reader, None)
-        for center_img, left_img, right_img, center_angle, _, _, _ in reader:
-            angle = float(center_angle)
-            #if abs(angle) < 0.1:
-            image_names.append(center_img.strip())
-            steering_angles.append(angle)
+        for _, left_img, right_img, angle, _, _, speed in reader:
+            angle = float(angle)
+            if float(speed) < 20:
+                continue
             image_names.append(left_img.strip())
             steering_angles.append(angle + steering_offset)
             image_names.append(right_img.strip())
@@ -213,7 +212,7 @@ if __name__=="__main__":
 
     X_train, y_train = get_csv_data2(log_file)
     X_train, y_train = shuffle(X_train, y_train, random_state=42)
-    X_train, X_validation, y_train, y_validation = train_test_split(X_train, y_train, test_size=0.2, random_state=42)
+    X_train, X_validation, y_train, y_validation = train_test_split(X_train, y_train, test_size=0.1, random_state=42)
 
     # Stop training if the validation loss doesn't improve for 5 consecutive epochs
     # early_stop = callbacks.EarlyStopping(monitor='val_loss', min_delta=0, patience=5, verbose=0, mode='auto')
