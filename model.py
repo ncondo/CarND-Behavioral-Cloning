@@ -93,19 +93,19 @@ def get_model():
         # Convolutional layer 1 24@31x98 | 5x5 kernel | 2x2 stride | elu activation 
         Convolution2D(24, 5, 5, border_mode='valid', activation='elu', subsample=(2, 2), init='he_normal', W_regularizer=l2(0.001)),
         # Dropout with drop probability of .1 (keep probability of .9)
-        Dropout(.1),
+        #Dropout(.1),
         # Convolutional layer 2 36@14x47 | 5x5 kernel | 2x2 stride | elu activation
         Convolution2D(36, 5, 5, border_mode='valid', activation='elu', subsample=(2, 2), init='he_normal', W_regularizer=l2(0.001)),
         # Dropout with drop probability of .2 (keep probability of .8)
-        Dropout(.2),
+        #Dropout(.2),
         # Convolutional layer 3 48@5x22  | 5x5 kernel | 2x2 stride | elu activation
         Convolution2D(48, 5, 5, border_mode='valid', activation='elu', subsample=(2, 2), init='he_normal', W_regularizer=l2(0.001)),
         # Dropout with drop probability of .2 (keep probability of .8)
-        Dropout(.2),
+        #Dropout(.2),
         # Convolutional layer 4 64@3x20  | 3x3 kernel | 1x1 stride | elu activation
         Convolution2D(64, 3, 3, border_mode='valid', activation='elu', subsample=(1, 1), init='he_normal', W_regularizer=l2(0.001)),
         # Dropout with drop probability of .2 (keep probability of .8)
-        Dropout(.2),
+        #Dropout(.2),
         # Convolutional layer 5 64@1x18  | 3x3 kernel | 1x1 stride | elu activation
         Convolution2D(64, 3, 3, border_mode='valid', activation='elu', subsample=(1, 1), init='he_normal', W_regularizer=l2(0.001)),
         # Flatten
