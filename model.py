@@ -39,7 +39,7 @@ def get_csv_data(training_file):
 def generate_batch(data_list, batch_size=64):
     images = np.zeros((batch_size, 66, 200, 3), dtype=np.float32)
     angles = np.zeros((batch_size,), dtype=np.float32)
-    OFFSETS = [0, .15, -.15]
+    OFFSETS = [0, .25, -.25]
     while 1:
         straight_count = 0
         for i in range(batch_size):
@@ -159,7 +159,7 @@ if __name__=="__main__":
     # early_stop = callbacks.EarlyStopping(monitor='val_loss', min_delta=0, patience=5, verbose=0, mode='auto')
     # Get model and train using fit generator due to memory constraints
     model = get_model()
-    model.fit_generator(generate_batch(training_list), samples_per_epoch=24000, nb_epoch=32, validation_data=generate_batch(validation_list), nb_val_samples=1024) #, callbacks=[early_stop])
+    model.fit_generator(generate_batch(training_list), samples_per_epoch=24000, nb_epoch=50, validation_data=generate_batch(validation_list), nb_val_samples=1024) #, callbacks=[early_stop])
 
     print('Saving model weights and configuration file.')
     # Save model weights
