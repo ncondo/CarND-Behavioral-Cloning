@@ -157,10 +157,10 @@ if __name__=="__main__":
     validation_list = data_list[math.floor(len(data_list)*.9):]
 
     # Stop training if the validation loss doesn't improve for 5 consecutive epochs
-    # early_stop = callbacks.EarlyStopping(monitor='val_loss', min_delta=0, patience=5, verbose=0, mode='auto')
+    early_stop = callbacks.EarlyStopping(monitor='val_loss', min_delta=0, patience=5, verbose=0, mode='auto')
     # Get model and train using fit generator due to memory constraints
     model = get_model()
-    model.fit_generator(generate_batch(training_list), samples_per_epoch=24000, nb_epoch=50, validation_data=generate_batch(validation_list), nb_val_samples=1024) #, callbacks=[early_stop])
+    model.fit_generator(generate_batch(training_list), samples_per_epoch=24000, nb_epoch=200, validation_data=generate_batch(validation_list), nb_val_samples=1024, callbacks=[early_stop])
 
     print('Saving model weights and configuration file.')
     # Save model weights
