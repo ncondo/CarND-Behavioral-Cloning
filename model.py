@@ -54,7 +54,7 @@ def generate_batch(data_list, batch_size=64):
                     row = random.randrange(len(data_list))
             image_index = random.randrange(len(OFFSETS))
             image = cv2.imread('data/' + str(data_list[row][image_index]).strip())
-            image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+            #image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
             image = process_image(image)
             image = np.array(image, dtype=np.float32)
             angle = float(data_list[row][3]) + OFFSETS[image_index]
@@ -80,15 +80,22 @@ def crop_image(image):
 
 
 def random_brightness(image):
-    image = cv2.cvtColor(image, cv2.COLOR_RGB2HSV)
+    #image = cv2.cvtColor(image, cv2.COLOR_RGB2HSV)
+    image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
     brightness = .25 + np.random.uniform()
     image[:,:,2] = image[:,:,2] * brightness
-    image = cv2.cvtColor(image, cv2.COLOR_HSV2RGB)
+    #image = cv2.cvtColor(image, cv2.COLOR_HSV2RGB)
+    image = cv2.cvtColor(image, cv2.COLOR_HSV2BGR)
     return image
+
+
+def bgr_to_yuv(image):
+    return cv2.cvtColor(image, cv2.COLOR_BGR2YCrCb)
 
 
 def process_image(image):
     image = random_brightness(image)
+    image = bgr_to_yuv(image)
     image = crop_image(image)
     image = resize(image)
     return image
@@ -136,8 +143,8 @@ def get_model():
         # Output
         Dense(1, init='he_normal')
     ])
-    optimizer = Adam(lr=0.0001)
-    model.compile(optimizer=optimizer, loss='mse')
+
+    model.compile(optimizer='adam', loss='mse')
     model.summary()
 
     return model
@@ -157,10 +164,10 @@ if __name__=="__main__":
     validation_list = data_list[math.floor(len(data_list)*.9):]
 
     # Stop training if the validation loss doesn't improve for 5 consecutive epochs
-    early_stop = callbacks.EarlyStopping(monitor='val_loss', min_delta=0, patience=5, verbose=0, mode='auto')
+    # early_stop = callbacks.EarlyStopping(monitor='val_loss', min_delta=0, patience=5, verbose=0, mode='auto')
     # Get model and train using fit generator due to memory constraints
     model = get_model()
-    model.fit_generator(generate_batch(training_list), samples_per_epoch=24000, nb_epoch=200, validation_data=generate_batch(validation_list), nb_val_samples=1024, callbacks=[early_stop])
+    model.fit_generator(generate_batch(training_list), samples_per_epoch=24000, nb_epoch=40, validation_data=generate_batch(validation_list), nb_val_samples=1024)#, callbacks=[early_stop])
 
     print('Saving model weights and configuration file.')
     # Save model weights
