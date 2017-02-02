@@ -39,10 +39,12 @@ def get_csv_data(training_file):
 def generate_batch(data_list, batch_size=64):
     images = np.zeros((batch_size, 66, 200, 3), dtype=np.float32)
     angles = np.zeros((batch_size,), dtype=np.float32)
+    # Offsets to be added to left and right images
     OFFSETS = [0, .2, -.2]
     while 1:
         straight_count = 0
         for i in range(batch_size):
+            # Choose a random row from the data list
             row = random.randrange(len(data_list))
             # Limit angles of less than absolute value of .1 to no more than 1/2 of data
             # to reduce bias of car driving straight
@@ -51,13 +53,14 @@ def generate_batch(data_list, batch_size=64):
             if straight_count > math.floor(batch_size * .5):
                 while abs(float(data_list[row][3])) < .1:
                     row = random.randrange(len(data_list))
+            # Randomly choose between the left, center, or right image 
             image_index = random.randrange(len(OFFSETS))
             image = cv2.imread('data/' + str(data_list[row][image_index]).strip())
             image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
             image = process_image(image)
             image = np.array(image, dtype=np.float32)
             angle = float(data_list[row][3]) + OFFSETS[image_index]
-            # Flip image 50% of the time
+            # Flip image and negate angle 50% of the time
             if np.random.randint(2) == 0:
                 image = cv2.flip(image, 1)
                 angle = -angle
@@ -67,18 +70,31 @@ def generate_batch(data_list, batch_size=64):
 
 
 def resize(image):
+    """
+    Returns an image resized to match the input size of the network
+    param: image represented by a 2D numpy array
+    """
     return cv2.resize(image, (200, 66), interpolation=cv2.INTER_AREA)
 
 
 def normalize(image):
+    """
+    Returns a normalized image with feature values from -1.0 to 1.0
+    param: image represented by a 2D numpy array
+    """
     return image / 127.5 - 1.
 
 
 def crop_image(image):
+    """
+    Returns a image cropped 40 pixels from top and 20 pixels from bottom
+    param: image represented by a 2D numpy array
+    """
     return image[40:-20,:]
 
 
 def random_brightness(image):
+
     image = cv2.cvtColor(image, cv2.COLOR_RGB2HSV)
     brightness = .25 + np.random.uniform()
     image[:,:,2] = image[:,:,2] * brightness
@@ -118,7 +134,7 @@ def get_model():
         Convolution2D(64, 3, 3, border_mode='valid', activation='elu', subsample=(1, 1), init='he_normal', W_regularizer=l2(0.001)),
         # Flatten
         Flatten(),
-        # Dropout with drop probability of .2 (keep probability of .8)
+        # Dropout with drop probability of .3 (keep probability of .7)
         Dropout(.3),
         # Fully-connected layer 1 | 100 neurons | elu activation
         Dense(100, activation='elu', init='he_normal', W_regularizer=l2(0.001)),
@@ -129,11 +145,11 @@ def get_model():
         # Dropout with drop probability of .5
         Dropout(.5),
         # Fully-connected layer 3 | 10 neurons | elu activation
-        Dense(10, activation='tanh', init='he_normal', W_regularizer=l2(0.001)),
+        Dense(10, activation='elu', init='he_normal', W_regularizer=l2(0.001)),
         # Dropout with drop probability of .5
         Dropout(.5),
         # Output
-        Dense(1, init='he_normal')
+        Dense(1, activation='linear', init='he_normal')
     ])
 
     model.compile(optimizer='adam', loss='mse')
