@@ -40,16 +40,16 @@ def get_csv_data(training_file):
 def generate_batch(data_list, batch_size=64):
     images = np.zeros((batch_size, 66, 200, 3), dtype=np.float32)
     angles = np.zeros((batch_size,), dtype=np.float32)
-    OFFSETS = [0, .25, -.25]
+    OFFSETS = [0, .2, -.2]
     while 1:
         straight_count = 0
         for i in range(batch_size):
             row = random.randrange(len(data_list))
-            # Limit angles of less than absolute value of .1 to no more than 1/3 of data
+            # Limit angles of less than absolute value of .1 to no more than 1/2 of data
             # to reduce bias of car driving straight
             if abs(float(data_list[row][3])) < .1:
                 straight_count += 1
-            if straight_count > math.floor(batch_size * .33):
+            if straight_count > math.floor(batch_size * .5):
                 while abs(float(data_list[row][3])) < .1:
                     row = random.randrange(len(data_list))
             image_index = random.randrange(len(OFFSETS))
