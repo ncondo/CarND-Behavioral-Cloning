@@ -41,8 +41,16 @@ def generate_batch(data_list, batch_size=64):
     angles = np.zeros((batch_size,), dtype=np.float32)
     OFFSETS = [0, .2, -.2]
     while 1:
+        straight_count = 0
         for i in range(batch_size):
             row = random.randrange(len(data_list))
+            # Limit angles of less than absolute value of .1 to no more than 1/3 of data
+            # to reduce bias of car driving straight
+            if float(data_list[row][3]) < abs(.1):
+                straight_count += 1
+            if straight_count > math.floor(batch_size * .33):
+                while float(data_list[row][3]) < abs(.1):
+                    row = random.randrange(len(data_list))
             image_index = random.randrange(len(OFFSETS))
             image = cv2.imread('data/' + str(data_list[row][image_index]).strip())
             image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
@@ -92,20 +100,12 @@ def get_model():
         Lambda(normalize, input_shape=(66, 200, 3)),
         # Convolutional layer 1 24@31x98 | 5x5 kernel | 2x2 stride | elu activation 
         Convolution2D(24, 5, 5, border_mode='valid', activation='elu', subsample=(2, 2), init='he_normal', W_regularizer=l2(0.001)),
-        # Dropout with drop probability of .1 (keep probability of .9)
-        #Dropout(.1),
         # Convolutional layer 2 36@14x47 | 5x5 kernel | 2x2 stride | elu activation
         Convolution2D(36, 5, 5, border_mode='valid', activation='elu', subsample=(2, 2), init='he_normal', W_regularizer=l2(0.001)),
-        # Dropout with drop probability of .2 (keep probability of .8)
-        #Dropout(.2),
         # Convolutional layer 3 48@5x22  | 5x5 kernel | 2x2 stride | elu activation
         Convolution2D(48, 5, 5, border_mode='valid', activation='elu', subsample=(2, 2), init='he_normal', W_regularizer=l2(0.001)),
-        # Dropout with drop probability of .2 (keep probability of .8)
-        #Dropout(.2),
         # Convolutional layer 4 64@3x20  | 3x3 kernel | 1x1 stride | elu activation
         Convolution2D(64, 3, 3, border_mode='valid', activation='elu', subsample=(1, 1), init='he_normal', W_regularizer=l2(0.001)),
-        # Dropout with drop probability of .2 (keep probability of .8)
-        #Dropout(.2),
         # Convolutional layer 5 64@1x18  | 3x3 kernel | 1x1 stride | elu activation
         Convolution2D(64, 3, 3, border_mode='valid', activation='elu', subsample=(1, 1), init='he_normal', W_regularizer=l2(0.001)),
         # Flatten
