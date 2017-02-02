@@ -46,10 +46,10 @@ def generate_batch(data_list, batch_size=64):
             row = random.randrange(len(data_list))
             # Limit angles of less than absolute value of .1 to no more than 1/3 of data
             # to reduce bias of car driving straight
-            if float(data_list[row][3]) < abs(.1):
+            if abs(float(data_list[row][3])) < .1:
                 straight_count += 1
             if straight_count > math.floor(batch_size * .33):
-                while float(data_list[row][3]) < abs(.1):
+                while abs(float(data_list[row][3])) < .1:
                     row = random.randrange(len(data_list))
             image_index = random.randrange(len(OFFSETS))
             image = cv2.imread('data/' + str(data_list[row][image_index]).strip())
