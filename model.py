@@ -14,7 +14,6 @@ from keras.layers import Activation, Dense, Dropout, ELU, Flatten, Input, Lambda
 from keras.layers.convolutional import Convolution2D, Cropping2D
 from keras.models import Sequential, Model, load_model, model_from_json
 from keras.regularizers import l2
-from keras.optimizers import Adam
 from keras import callbacks
 
 
@@ -54,7 +53,7 @@ def generate_batch(data_list, batch_size=64):
                     row = random.randrange(len(data_list))
             image_index = random.randrange(len(OFFSETS))
             image = cv2.imread('data/' + str(data_list[row][image_index]).strip())
-            #image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+            image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
             image = process_image(image)
             image = np.array(image, dtype=np.float32)
             angle = float(data_list[row][3]) + OFFSETS[image_index]
@@ -80,22 +79,15 @@ def crop_image(image):
 
 
 def random_brightness(image):
-    #image = cv2.cvtColor(image, cv2.COLOR_RGB2HSV)
-    image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+    image = cv2.cvtColor(image, cv2.COLOR_RGB2HSV)
     brightness = .25 + np.random.uniform()
     image[:,:,2] = image[:,:,2] * brightness
-    #image = cv2.cvtColor(image, cv2.COLOR_HSV2RGB)
-    image = cv2.cvtColor(image, cv2.COLOR_HSV2BGR)
+    image = cv2.cvtColor(image, cv2.COLOR_HSV2RGB)
     return image
-
-
-def bgr_to_yuv(image):
-    return cv2.cvtColor(image, cv2.COLOR_BGR2YCrCb)
 
 
 def process_image(image):
     image = random_brightness(image)
-    image = bgr_to_yuv(image)
     image = crop_image(image)
     image = resize(image)
     return image
@@ -137,7 +129,7 @@ def get_model():
         # Dropout with drop probability of .5
         Dropout(.5),
         # Fully-connected layer 3 | 10 neurons | elu activation
-        Dense(10, activation='elu', init='he_normal', W_regularizer=l2(0.001)),
+        Dense(10, activation='tanh', init='he_normal', W_regularizer=l2(0.001)),
         # Dropout with drop probability of .5
         Dropout(.5),
         # Output
