@@ -135,8 +135,8 @@ def get_model():
         # Output
         Dense(1, init='he_normal')
     ])
-
-    model.compile(optimizer='adam', loss='mse')
+    optimizer = Adam(lr=0.0001)
+    model.compile(optimizer=optimizer, loss='mse')
     model.summary()
 
     return model
@@ -172,5 +172,3 @@ if __name__=="__main__":
     from keras import backend as K 
 
     K.clear_session()
-
-
