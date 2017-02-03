@@ -30,6 +30,7 @@ def get_csv_data(log_file):
 
 
 def generate_batch(X_train, y_train, batch_size=64):
+    
     images = np.zeros((batch_size, 66, 200, 3), dtype=np.float32)
     angles = np.zeros((batch_size,), dtype=np.float32)
     while True:
@@ -78,13 +79,17 @@ def normalize(image):
 
 def crop_image(image):
     """
-    Returns a image cropped 40 pixels from top and 20 pixels from bottom
+    Returns an image cropped 40 pixels from top and 20 pixels from bottom
     param: image represented as a numpy array
     """
     return image[40:-20,:]
 
 
 def random_brightness(image):
+    """
+    Returns an image with a random degree of brightness
+    param: image represented as a numpy array
+    """
     image = cv2.cvtColor(image, cv2.COLOR_RGB2HSV)
     brightness = .25 + np.random.uniform()
     image[:,:,2] = image[:,:,2] * brightness
@@ -104,7 +109,9 @@ def process_image(image):
 
 
 def get_model():
-
+    """
+    Returns a compiled keras model ready for training
+    """
     model = Sequential([
         # Normalize image to -1.0 to 1.0
         Lambda(normalize, input_shape=(66, 200, 3)),
@@ -147,21 +154,20 @@ def get_model():
     ])
 
     model.compile(optimizer='adam', loss='mse')
-    model.summary()
 
     return model    
 
 
 if __name__=="__main__":
-
     # Get the training data from log file, shuffle, and split into train/validation datasets
     X_train, y_train = get_csv_data('data/driving_log.csv')
     X_train, y_train = shuffle(X_train, y_train, random_state=14)
     X_train, X_validation, y_train, y_validation = train_test_split(X_train, y_train, test_size=0.1, random_state=14)
 
-    # Get model and train using fit generator due to memory constraints
+    # Get model, print summary, and train using a generator
     model = get_model()
-    model.fit_generator(generate_batch(X_train, y_train), samples_per_epoch=24000, nb_epoch=28, validation_data=generate_batch(X_validation, y_validation), nb_val_samples=1024)#, callbacks=[early_stop])
+    model.summary()
+    model.fit_generator(generate_batch(X_train, y_train), samples_per_epoch=24000, nb_epoch=30, validation_data=generate_batch(X_validation, y_validation), nb_val_samples=1024)#, callbacks=[early_stop])
 
     print('Saving model weights and configuration file.')
     # Save model weights
