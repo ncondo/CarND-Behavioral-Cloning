@@ -46,10 +46,8 @@ def get_csv_data2(log_file):
             angle = float(angle)
             if float(speed) < 20:
                 continue
-            #image_names.append(center_img.strip())
-            #steering_angles.append(angle)
-            image_names.append([left_img.strip(), right_img.strip()])
-            steering_angles.append([angle+steering_offset, angle-steering_offset])
+            image_names.append([center_img.strip(), left_img.strip(), right_img.strip()])
+            steering_angles.append([angle, angle+steering_offset, angle-steering_offset])
 
     return image_names, steering_angles
 
