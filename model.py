@@ -91,7 +91,7 @@ def random_shadow(image):
     Returns an image with a "shadow" randomly placed
     param: image represented by a 2D numpy array
     """
-    h, w = image.size
+    h, w = image.shape[0], image.shape[1]
     # Create a random box on image
     x1, y1 = random.randint(0, w), random.randint(0, h)
     x2, y2 = random.randint(x1, w), random.randint(y1, h)
@@ -106,8 +106,8 @@ def random_shadow(image):
 
 def process_image(image):
     image = random_brightness(image)
-    if random.randrange(2) == 1:
-        image = random_shadow(image)
+    #if random.randrange(2) == 1:
+        #image = random_shadow(image)
     image = crop_image(image)
     image = resize(image)
     return image
