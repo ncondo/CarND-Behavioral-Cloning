@@ -12,7 +12,7 @@ from keras.regularizers import l2
 
 def get_csv_data(log_file):
     image_names, steering_angles = [], []
-    steering_offset = 0.15
+    steering_offset = 0.3
     with open(log_file, 'r') as f:
         reader = csv.reader(f)
         next(reader, None)
@@ -86,8 +86,28 @@ def random_brightness(image):
     return image
 
 
+def random_shadow(image):
+    """
+    Returns an image with a "shadow" randomly placed
+    param: image represented by a 2D numpy array
+    """
+    h, w = image.size
+    # Create a random box on image
+    x1, y1 = random.randint(0, w), random.randint(0, h)
+    x2, y2 = random.randint(x1, w), random.randint(y1, h)
+
+    # Loop through pixels in the box and darken
+    for i in range(x1, x2):
+        for j in range(y1, y2):
+            new_val = tuple([int(x * 0.5) for x in image.getpixel((i, j))])
+            image.putpixel((i, j), new_val)
+    return image
+
+
 def process_image(image):
     image = random_brightness(image)
+    if random.randrange(2) == 1:
+        image = random_shadow(image)
     image = crop_image(image)
     image = resize(image)
     return image
