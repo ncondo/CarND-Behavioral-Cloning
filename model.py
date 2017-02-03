@@ -12,12 +12,12 @@ from keras.regularizers import l2
 
 def get_csv_data(log_file):
     """
-    Utility function returns two python lists of training examples and labels
-    from a csv log file
-    param: path of log file
+    Reads a csv file and returns two lists separated into examples and labels.
+    :param log_file: The path of the log file to be read.
     """
     image_names, steering_angles = [], []
-    steering_offset = 0.225
+    # Steering offset used for left and right images
+    steering_offset = 0.2
     with open(log_file, 'r') as f:
         reader = csv.reader(f)
         next(reader, None)
@@ -30,7 +30,12 @@ def get_csv_data(log_file):
 
 
 def generate_batch(X_train, y_train, batch_size=64):
-    
+    """
+    Return two numpy arrays containing images and their associated steering angles.
+    :param X_train: A list of image names to be read in from data directory.
+    :param y_train: A list of steering angles associated with each image.
+    :param batch_size: The size of the numpy arrays to be return on each pass.
+    """
     images = np.zeros((batch_size, 66, 200, 3), dtype=np.float32)
     angles = np.zeros((batch_size,), dtype=np.float32)
     while True:
@@ -63,32 +68,32 @@ def generate_batch(X_train, y_train, batch_size=64):
 
 def resize(image):
     """
-    Returns an image resized to match the input size of the network
-    param: image represented as a numpy array
+    Returns an image resized to match the input size of the network.
+    :param image: Image represented as a numpy array.
     """
     return cv2.resize(image, (200, 66), interpolation=cv2.INTER_AREA)
 
 
 def normalize(image):
     """
-    Returns a normalized image with feature values from -1.0 to 1.0
-    param: image represented as a numpy array
+    Returns a normalized image with feature values from -1.0 to 1.0.
+    :param image: Image represented as a numpy array.
     """
     return image / 127.5 - 1.
 
 
 def crop_image(image):
     """
-    Returns an image cropped 40 pixels from top and 20 pixels from bottom
-    param: image represented as a numpy array
+    Returns an image cropped 40 pixels from top and 20 pixels from bottom.
+    :param image: Image represented as a numpy array.
     """
     return image[40:-20,:]
 
 
 def random_brightness(image):
     """
-    Returns an image with a random degree of brightness
-    param: image represented as a numpy array
+    Returns an image with a random degree of brightness.
+    :param image: Image represented as a numpy array.
     """
     image = cv2.cvtColor(image, cv2.COLOR_RGB2HSV)
     brightness = .25 + np.random.uniform()
@@ -99,8 +104,8 @@ def random_brightness(image):
 
 def process_image(image):
     """
-    Returns an image after applying several preprocessing functions
-    param: image represented as a numpy array
+    Returns an image after applying several preprocessing functions.
+    :param image: Image represented as a numpy array.
     """
     image = random_brightness(image)
     image = crop_image(image)
@@ -110,7 +115,7 @@ def process_image(image):
 
 def get_model():
     """
-    Returns a compiled keras model ready for training
+    Returns a compiled keras model ready for training.
     """
     model = Sequential([
         # Normalize image to -1.0 to 1.0
@@ -154,7 +159,6 @@ def get_model():
     ])
 
     model.compile(optimizer='adam', loss='mse')
-
     return model    
 
 
