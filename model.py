@@ -11,8 +11,13 @@ from keras.regularizers import l2
 
 
 def get_csv_data(log_file):
+    """
+    Utility function returns two python lists of training examples and labels
+    from a csv log file
+    param: path of log file
+    """
     image_names, steering_angles = [], []
-    steering_offset = 0.25
+    steering_offset = 0.225
     with open(log_file, 'r') as f:
         reader = csv.reader(f)
         next(reader, None)
@@ -30,6 +35,7 @@ def generate_batch(X_train, y_train, batch_size=64):
     while True:
         straight_count = 0
         for i in range(batch_size):
+            # Select a random index to use for data sample
             sample_index = random.randrange(len(X_train))
             image_index = random.randrange(len(X_train[0]))
             angle = y_train[sample_index][image_index]
@@ -57,7 +63,7 @@ def generate_batch(X_train, y_train, batch_size=64):
 def resize(image):
     """
     Returns an image resized to match the input size of the network
-    param: image represented by a 2D numpy array
+    param: image represented as a numpy array
     """
     return cv2.resize(image, (200, 66), interpolation=cv2.INTER_AREA)
 
@@ -65,7 +71,7 @@ def resize(image):
 def normalize(image):
     """
     Returns a normalized image with feature values from -1.0 to 1.0
-    param: image represented by a 2D numpy array
+    param: image represented as a numpy array
     """
     return image / 127.5 - 1.
 
@@ -73,7 +79,7 @@ def normalize(image):
 def crop_image(image):
     """
     Returns a image cropped 40 pixels from top and 20 pixels from bottom
-    param: image represented by a 2D numpy array
+    param: image represented as a numpy array
     """
     return image[40:-20,:]
 
@@ -87,6 +93,10 @@ def random_brightness(image):
 
 
 def process_image(image):
+    """
+    Returns an image after applying several preprocessing functions
+    param: image represented as a numpy array
+    """
     image = random_brightness(image)
     image = crop_image(image)
     image = resize(image)
@@ -144,16 +154,14 @@ def get_model():
 
 if __name__=="__main__":
 
-    # Get the Udacity provided training data from file and save it in a list
-    log_file = 'data/driving_log.csv'
-
-    X_train, y_train = get_csv_data(log_file)
+    # Get the training data from log file, shuffle, and split into train/validation datasets
+    X_train, y_train = get_csv_data('data/driving_log.csv')
     X_train, y_train = shuffle(X_train, y_train, random_state=14)
     X_train, X_validation, y_train, y_validation = train_test_split(X_train, y_train, test_size=0.1, random_state=14)
 
     # Get model and train using fit generator due to memory constraints
     model = get_model()
-    model.fit_generator(generate_batch(X_train, y_train), samples_per_epoch=24000, nb_epoch=25, validation_data=generate_batch(X_validation, y_validation), nb_val_samples=1024)#, callbacks=[early_stop])
+    model.fit_generator(generate_batch(X_train, y_train), samples_per_epoch=24000, nb_epoch=28, validation_data=generate_batch(X_validation, y_validation), nb_val_samples=1024)#, callbacks=[early_stop])
 
     print('Saving model weights and configuration file.')
     # Save model weights
