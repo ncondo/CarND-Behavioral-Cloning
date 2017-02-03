@@ -17,7 +17,7 @@ def get_csv_data(log_file):
     """
     image_names, steering_angles = [], []
     # Steering offset used for left and right images
-    steering_offset = 0.2
+    steering_offset = 0.225
     with open(log_file, 'r') as f:
         reader = csv.reader(f)
         next(reader, None)
@@ -141,7 +141,7 @@ def get_model():
         # Flatten
         Flatten(),
         # Dropout with drop probability of .3 (keep probability of .7)
-        Dropout(.3),
+        Dropout(.2),
         # Fully-connected layer 1 | 100 neurons | elu activation
         Dense(100, activation='elu', init='he_normal', W_regularizer=l2(0.001)),
         # Dropout with drop probability of .5
