@@ -12,7 +12,7 @@ from keras.regularizers import l2
 
 def get_csv_data(log_file):
     image_names, steering_angles = [], []
-    steering_offset = 0.3
+    steering_offset = 0.2
     with open(log_file, 'r') as f:
         reader = csv.reader(f)
         next(reader, None)
@@ -85,8 +85,31 @@ def random_brightness(image):
     image = cv2.cvtColor(image, cv2.COLOR_HSV2RGB)
     return image
 
+def add_random_shadow(image):
+    top_y = 320*np.random.uniform()
+    top_x = 0
+    bot_x = 160
+    bot_y = 320*np.random.uniform()
+    image_hls = cv2.cvtColor(image,cv2.COLOR_RGB2HLS)
+    shadow_mask = 0*image_hls[:,:,1]
+    X_m = np.mgrid[0:image.shape[0],0:image.shape[1]][0]
+    Y_m = np.mgrid[0:image.shape[0],0:image.shape[1]][1]
+    shadow_mask[((X_m-top_x)*(bot_y-top_y) -(bot_x - top_x)*(Y_m-top_y) >=0)]=1
+    #random_bright = .25+.7*np.random.uniform()
+    if np.random.randint(2)==1:
+        random_bright = .5
+        cond1 = shadow_mask==1
+        cond0 = shadow_mask==0
+        if np.random.randint(2)==1:
+            image_hls[:,:,1][cond1] = image_hls[:,:,1][cond1]*random_bright
+        else:
+            image_hls[:,:,1][cond0] = image_hls[:,:,1][cond0]*random_bright    
+    image = cv2.cvtColor(image_hls,cv2.COLOR_HLS2RGB)
 
-def random_shadow(image):
+    return image
+
+
+def random_shadow2(image):
     """
     Returns an image with a "shadow" randomly placed
     param: image represented by a 2D numpy array
@@ -106,8 +129,8 @@ def random_shadow(image):
 
 def process_image(image):
     image = random_brightness(image)
-    #if random.randrange(2) == 1:
-        #image = random_shadow(image)
+    if random.randrange(2) == 1:
+        image = random_shadow(image)
     image = crop_image(image)
     image = resize(image)
     return image
