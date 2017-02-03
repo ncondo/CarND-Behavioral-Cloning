@@ -1,44 +1,18 @@
 import tensorflow as tf
 import numpy as np
-from PIL import Image
+import random, csv, cv2, json, h5py
+
 from sklearn.utils import shuffle
 from sklearn.model_selection import train_test_split
-import math
-import random
-import csv
-import cv2
-import os
-import json
-import h5py
-
 from keras.layers import Activation, Dense, Dropout, ELU, Flatten, Input, Lambda
 from keras.layers.convolutional import Convolution2D, Cropping2D
 from keras.models import Sequential, Model, load_model, model_from_json
 from keras.regularizers import l2
-from keras import callbacks
-
 
 
 def get_csv_data(log_file):
-    """
-    Utility function to load training data from a csv file and
-    return data as a python list.
-
-    param: path of csv file containing the data
-    """
-    with open(training_file, 'r') as f:
-        reader = csv.reader(f)
-        next(reader, None)
-        data_list = list(reader)
-
-    f.close()
-
-    return data_list
-
-
-def get_csv_data2(log_file):
     image_names, steering_angles = [], []
-    steering_offset = 0.2
+    steering_offset = 0.25
     with open(log_file, 'r') as f:
         reader = csv.reader(f)
         next(reader, None)
@@ -50,7 +24,7 @@ def get_csv_data2(log_file):
     return image_names, steering_angles
 
 
-def generate_batch2(X_train, y_train, batch_size=64):
+def generate_batch(X_train, y_train, batch_size=64):
     images = np.zeros((batch_size, 66, 200, 3), dtype=np.float32)
     angles = np.zeros((batch_size,), dtype=np.float32)
     while True:
@@ -73,40 +47,6 @@ def generate_batch2(X_train, y_train, batch_size=64):
             image = np.array(image, dtype=np.float32)
             # Flip image and apply opposite angle 50% of the time
             if random.randrange(2) == 1:
-                image = cv2.flip(image, 1)
-                angle = -angle
-            images[i] = image
-            angles[i] = angle
-        yield images, angles
-
-
-
-def generate_batch(data_list, batch_size=64):
-    images = np.zeros((batch_size, 66, 200, 3), dtype=np.float32)
-    angles = np.zeros((batch_size,), dtype=np.float32)
-    # Offsets to be added to left and right images
-    OFFSETS = [0, .2, -.2]
-    while 1:
-        straight_count = 0
-        for i in range(batch_size):
-            # Choose a random row from the data list
-            row = random.randrange(len(data_list))
-            # Limit angles of less than absolute value of .1 to no more than 1/2 of data
-            # to reduce bias of car driving straight
-            if abs(float(data_list[row][3])) < .1:
-                straight_count += 1
-            if straight_count > math.floor(batch_size * .5):
-                while abs(float(data_list[row][3])) < .1:
-                    row = random.randrange(len(data_list))
-            # Randomly choose between the left, center, or right image 
-            image_index = random.randrange(len(OFFSETS))
-            image = cv2.imread('data/' + str(data_list[row][image_index]).strip())
-            image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-            image = process_image(image)
-            image = np.array(image, dtype=np.float32)
-            angle = float(data_list[row][3]) + OFFSETS[image_index]
-            # Flip image and negate angle 50% of the time
-            if np.random.randint(2) == 0:
                 image = cv2.flip(image, 1)
                 angle = -angle
             images[i] = image
@@ -139,7 +79,6 @@ def crop_image(image):
 
 
 def random_brightness(image):
-
     image = cv2.cvtColor(image, cv2.COLOR_RGB2HSV)
     brightness = .25 + np.random.uniform()
     image[:,:,2] = image[:,:,2] * brightness
@@ -200,30 +139,21 @@ def get_model():
     model.compile(optimizer='adam', loss='mse')
     model.summary()
 
-    return model
-    
+    return model    
 
 
 if __name__=="__main__":
 
     # Get the Udacity provided training data from file and save it in a list
     log_file = 'data/driving_log.csv'
-    
-    #data_list = get_csv_data(log_file)
-    # Shuffle the data and split into train and validation sets
-    #data_list = shuffle(data_list)
-    #training_list = data_list[:math.floor(len(data_list)*.9)]
-    #validation_list = data_list[math.floor(len(data_list)*.9):]
 
-    X_train, y_train = get_csv_data2(log_file)
+    X_train, y_train = get_csv_data(log_file)
     X_train, y_train = shuffle(X_train, y_train, random_state=42)
     X_train, X_validation, y_train, y_validation = train_test_split(X_train, y_train, test_size=0.1, random_state=42)
 
-    # Stop training if the validation loss doesn't improve for 5 consecutive epochs
-    # early_stop = callbacks.EarlyStopping(monitor='val_loss', min_delta=0, patience=5, verbose=0, mode='auto')
     # Get model and train using fit generator due to memory constraints
     model = get_model()
-    model.fit_generator(generate_batch2(X_train, y_train), samples_per_epoch=24000, nb_epoch=40, validation_data=generate_batch2(X_validation, y_validation), nb_val_samples=1024)#, callbacks=[early_stop])
+    model.fit_generator(generate_batch(X_train, y_train), samples_per_epoch=24000, nb_epoch=40, validation_data=generate_batch(X_validation, y_validation), nb_val_samples=1024)#, callbacks=[early_stop])
 
     print('Saving model weights and configuration file.')
     # Save model weights
