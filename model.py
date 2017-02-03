@@ -141,7 +141,7 @@ def get_model():
         # Flatten
         Flatten(),
         # Dropout with drop probability of .3 (keep probability of .7)
-        Dropout(.2),
+        Dropout(.3),
         # Fully-connected layer 1 | 100 neurons | elu activation
         Dense(100, activation='elu', init='he_normal', W_regularizer=l2(0.001)),
         # Dropout with drop probability of .5
