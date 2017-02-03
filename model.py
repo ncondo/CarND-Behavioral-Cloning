@@ -38,15 +38,16 @@ def get_csv_data(log_file):
 
 def get_csv_data2(log_file):
     image_names, steering_angles = [], []
-    steering_offset = 0.2
-    straight_count = 0
+    steering_offset = 0.25
     with open(log_file, 'r') as f:
         reader = csv.reader(f)
         next(reader, None)
-        for _, left_img, right_img, angle, _, _, speed in reader:
+        for center_img, left_img, right_img, angle, _, _, speed in reader:
             angle = float(angle)
             if float(speed) < 20:
                 continue
+            image_names.append(center_img.strip())
+            steering_angles.append(angle)
             image_names.append(left_img.strip())
             steering_angles.append(angle + steering_offset)
             image_names.append(right_img.strip())
