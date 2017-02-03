@@ -38,14 +38,12 @@ def get_csv_data(log_file):
 
 def get_csv_data2(log_file):
     image_names, steering_angles = [], []
-    steering_offset = 0.25
+    steering_offset = 0.2
     with open(log_file, 'r') as f:
         reader = csv.reader(f)
         next(reader, None)
-        for center_img, left_img, right_img, angle, _, _, speed in reader:
+        for center_img, left_img, right_img, angle, _, _, _ in reader:
             angle = float(angle)
-            if float(speed) < 20:
-                continue
             image_names.append([center_img.strip(), left_img.strip(), right_img.strip()])
             steering_angles.append([angle, angle+steering_offset, angle-steering_offset])
 
@@ -56,14 +54,23 @@ def generate_batch2(X_train, y_train, batch_size=64):
     images = np.zeros((batch_size, 66, 200, 3), dtype=np.float32)
     angles = np.zeros((batch_size,), dtype=np.float32)
     while True:
+        straight_count = 0
         for i in range(batch_size):
             sample_index = random.randrange(len(X_train))
             image_index = random.randrange(len(X_train[0]))
+            angle = y_train[sample_index][image_index]
+            # Limit angles of less than absolute value of .1 to no more than 3/10 of data
+            # to reduce bias of car driving straight
+            if abs(angle) < .1:
+                straight_count += 1
+            if straight_count > (batch_size * .3):
+                while abs(y_train[sample_index][image_index]) < .1:
+                    sample_index = random.randrange(len(X_train))
+            # Read image in from directory, process, and convert to numpy array
             image = cv2.imread('data/' + str(X_train[sample_index][image_index]))
             image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
             image = process_image(image)
             image = np.array(image, dtype=np.float32)
-            angle = y_train[sample_index][image_index]
             # Flip image and apply opposite angle 50% of the time
             if random.randrange(2) == 1:
                 image = cv2.flip(image, 1)
