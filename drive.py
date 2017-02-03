@@ -46,7 +46,7 @@ def telemetry(sid, data):
     steering_angle = float(model.predict(transformed_image_array, batch_size=1))
     # The driving model currently just outputs a constant throttle. Feel free to edit this.
     # Increase throttle when speed falls below 5mph (esp useful for track 2)
-    throttle = 0.2 if float(speed) > 10 else .4
+    throttle = 0.2 if float(speed) > 20 else .5
     print(steering_angle, throttle)
     send_control(steering_angle, throttle)
 
