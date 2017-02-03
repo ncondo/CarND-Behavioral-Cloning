@@ -17,7 +17,7 @@ def get_csv_data(log_file):
     """
     image_names, steering_angles = [], []
     # Steering offset used for left and right images
-    steering_offset = 0.25
+    steering_offset = 0.225
     with open(log_file, 'r') as f:
         reader = csv.reader(f)
         next(reader, None)
@@ -171,7 +171,7 @@ if __name__=="__main__":
     # Get model, print summary, and train using a generator
     model = get_model()
     model.summary()
-    model.fit_generator(generate_batch(X_train, y_train), samples_per_epoch=24000, nb_epoch=26, validation_data=generate_batch(X_validation, y_validation), nb_val_samples=1024)#, callbacks=[early_stop])
+    model.fit_generator(generate_batch(X_train, y_train), samples_per_epoch=24000, nb_epoch=28, validation_data=generate_batch(X_validation, y_validation), nb_val_samples=1024)#, callbacks=[early_stop])
 
     print('Saving model weights and configuration file.')
     # Save model weights
