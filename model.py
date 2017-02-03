@@ -59,11 +59,11 @@ def generate_batch2(X_train, y_train, batch_size=64):
             sample_index = random.randrange(len(X_train))
             image_index = random.randrange(len(X_train[0]))
             angle = y_train[sample_index][image_index]
-            # Limit angles of less than absolute value of .1 to no more than 3/10 of data
+            # Limit angles of less than absolute value of .1 to no more than 1/2 of data
             # to reduce bias of car driving straight
             if abs(angle) < .1:
                 straight_count += 1
-            if straight_count > (batch_size * .3):
+            if straight_count > (batch_size * .5):
                 while abs(y_train[sample_index][image_index]) < .1:
                     sample_index = random.randrange(len(X_train))
             # Read image in from directory, process, and convert to numpy array
