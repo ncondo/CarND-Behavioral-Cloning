@@ -85,7 +85,7 @@ def random_brightness(image):
     image = cv2.cvtColor(image, cv2.COLOR_HSV2RGB)
     return image
 
-def add_random_shadow(image):
+def random_shadow(image):
     top_y = 320*np.random.uniform()
     top_x = 0
     bot_x = 160
