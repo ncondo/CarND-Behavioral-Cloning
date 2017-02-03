@@ -153,7 +153,7 @@ if __name__=="__main__":
 
     # Get model and train using fit generator due to memory constraints
     model = get_model()
-    model.fit_generator(generate_batch(X_train, y_train), samples_per_epoch=24000, nb_epoch=20, validation_data=generate_batch(X_validation, y_validation), nb_val_samples=1024)#, callbacks=[early_stop])
+    model.fit_generator(generate_batch(X_train, y_train), samples_per_epoch=24000, nb_epoch=32, validation_data=generate_batch(X_validation, y_validation), nb_val_samples=1024)#, callbacks=[early_stop])
 
     print('Saving model weights and configuration file.')
     # Save model weights
