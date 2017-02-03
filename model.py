@@ -48,10 +48,8 @@ def get_csv_data2(log_file):
                 continue
             #image_names.append(center_img.strip())
             #steering_angles.append(angle)
-            image_names.append(left_img.strip())
-            steering_angles.append(angle + steering_offset)
-            image_names.append(right_img.strip())
-            steering_angles.append(angle - steering_offset)
+            image_names.append([left_img.strip(), right_img.strip()])
+            steering_angles.append([angle+steering_offset, angle-steering_offset])
 
     return image_names, steering_angles
 
@@ -62,11 +60,12 @@ def generate_batch2(X_train, y_train, batch_size=64):
     while True:
         for i in range(batch_size):
             sample_index = random.randrange(len(X_train))
-            image = cv2.imread('data/' + str(X_train[sample_index]))
+            image_index = random.randrange(len(X_train[0]))
+            image = cv2.imread('data/' + str(X_train[sample_index][image_index]))
             image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
             image = process_image(image)
             image = np.array(image, dtype=np.float32)
-            angle = y_train[sample_index]
+            angle = y_train[sample_index][image_index]
             # Flip image and apply opposite angle 50% of the time
             if random.randrange(2) == 1:
                 image = cv2.flip(image, 1)
