@@ -17,7 +17,7 @@ def get_csv_data(log_file):
     """
     image_names, steering_angles = [], []
     # Steering offset used for left and right images
-    steering_offset = 0.25
+    steering_offset = 0.275
     with open(log_file, 'r') as f:
         reader = csv.reader(f)
         next(reader, None)
