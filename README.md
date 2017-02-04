@@ -21,16 +21,18 @@ The goal of this project is to train a deep neural network to clone driving beha
 
 1. model.py
     * Contains all code for reading in training data and training a model to predict steering angles.
-    * `python model.py' will train a new model and save the output architecture as model.json and weights as model.h5.
-    * Running model.py will overwrite current model.json and model.h5 files - to prevent this rename models you want to save.
+    * `python model.py` will train a new model and save the output architecture as model.json and weights as model.h5.
+    * Running `python model.py` will overwrite current model.json and model.h5 files - to prevent this rename models you wish to keep.
 2. model.json
-    * Model architecture saved after running `python model.py`
+    * File containing model architecture
+    * Created/saved after running `python model.py`
 3. model.h5
-    * Model weights saved after running `python model.py`
+    * File containing model weights
+    * Created/saved after running `python model.py`
 4. drive.py
     * Contains code to serve predictions from a trained model to Udacity's simulator for autonomous driving.
     * `python drive.py model.json` will run the model (must have simulator open and in autonomous mode).
     * `python drive.py model.json run1` will run the model and save all images from the run in a new directory with name run1
 5. video.py
-    * Contains code to create an mp4 video from the previously saved images from an autonomous run.
+    * Contains code to create an mp4 video from the previously saved images of an autonomous run.
     * `python video.py run1`
