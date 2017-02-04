@@ -36,3 +36,9 @@ The goal of this project is to train a deep neural network to clone driving beha
 5. video.py
     * Contains code to create an mp4 video from the previously saved images of an autonomous run.
     * `python video.py run1`
+
+## Solution
+
+### Overview
+
+As a starting point, I used Nvidia's architecture from their white paper [End to End Learning for Self-Driving Cars](http://images.nvidia.com/content/tegra/automotive/images/2016/solutions/pdf/end-to-end-dl-using-px.pdf)

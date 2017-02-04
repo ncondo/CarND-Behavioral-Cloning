@@ -56,6 +56,9 @@ def generate_batch(X_train, y_train, batch_size=64):
             image = cv2.imread('data/' + str(X_train[sample_index][image_index]))
             image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
             image = process_image(image)
+            # Apply a horizontal shift to image 50% of the time
+            if random.randrange(2) == 1:
+                image = shift_image(image)
             image = np.array(image, dtype=np.float32)
             # Flip image and apply opposite angle 50% of the time
             if random.randrange(2) == 1:
@@ -99,6 +102,19 @@ def random_brightness(image):
     brightness = .25 + np.random.uniform()
     image[:,:,2] = image[:,:,2] * brightness
     image = cv2.cvtColor(image, cv2.COLOR_HSV2RGB)
+    return image
+
+
+def shift_image(image):
+    """
+    Return an image randomly shifted left or right.
+    :param image: Image represented as a numpy array.
+    """
+    rows, cols, _ = image.shape
+    x_shift = np.random.uniform(-2.0, 2.0)
+    y_shift = np.random.uniform(-2.0, 2.0)
+    M = np.float32([[1, 0, x_shift], [0, 1, y_shift]])
+    image = cv2.warpAffine(image, M, (cols,rows))
     return image
 
 
