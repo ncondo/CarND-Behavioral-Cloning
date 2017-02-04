@@ -14,4 +14,4 @@ The goal of this project is to train a deep neural network to clone driving beha
     * [Windows 64-bit](https://d17h27t6h515a5.cloudfront.net/topher/2016/November/5831f3a4_simulator-windows-64/simulator-windows-64.zip)
 3. Udacity's [sample dataset](https://d17h27t6h515a5.cloudfront.net/topher/2016/December/584f6edd_data/data.zip)
 4. Download or clone this repository
-    * git clone https://github.com/ncondo/CarND-Behavioral-Cloning 
+    `git clone https://github.com/ncondo/CarND-Behavioral-Cloning`
