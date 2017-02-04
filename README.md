@@ -41,4 +41,11 @@ The goal of this project is to train a deep neural network to clone driving beha
 
 ### Overview
 
-As a starting point, I used Nvidia's architecture from their white paper [End to End Learning for Self-Driving Cars](http://images.nvidia.com/content/tegra/automotive/images/2016/solutions/pdf/end-to-end-dl-using-px.pdf)
+As a starting point, I used Nvidia's architecture from their white paper [End to End Learning for Self-Driving Cars](http://images.nvidia.com/content/tegra/automotive/images/2016/solutions/pdf/end-to-end-dl-using-px.pdf). Their model proved to be very effective for this problem without much modification, besides hyperparameter tweaking and adding dropout and l2 regularization to prevent overfitting.
+
+
+
+
+
+
+
