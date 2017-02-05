@@ -17,7 +17,7 @@ def get_csv_data(log_file):
     """
     image_names, steering_angles = [], []
     # Steering offset used for left and right images
-    steering_offset = 0.25
+    steering_offset = 0.275
     with open(log_file, 'r') as f:
         reader = csv.reader(f)
         next(reader, None)
@@ -56,9 +56,6 @@ def generate_batch(X_train, y_train, batch_size=64):
             image = cv2.imread('data/' + str(X_train[sample_index][image_index]))
             image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
             image = process_image(image)
-            # Apply a random shift to image 50% of the time
-            if random.randrange(2) == 1:
-                image = shift_image(image)
             image = np.array(image, dtype=np.float32)
             # Flip image and apply opposite angle 50% of the time
             if random.randrange(2) == 1:
@@ -102,19 +99,6 @@ def random_brightness(image):
     brightness = .25 + np.random.uniform()
     image[:,:,2] = image[:,:,2] * brightness
     image = cv2.cvtColor(image, cv2.COLOR_HSV2RGB)
-    return image
-
-
-def shift_image(image):
-    """
-    Return an image randomly shifted left or right.
-    :param image: Image represented as a numpy array.
-    """
-    rows, cols, _ = image.shape
-    x_shift = np.random.uniform(-2.0, 2.0)
-    y_shift = np.random.uniform(-2.0, 2.0)
-    M = np.float32([[1, 0, x_shift], [0, 1, y_shift]])
-    image = cv2.warpAffine(image, M, (cols,rows))
     return image
 
 
@@ -187,7 +171,7 @@ if __name__=="__main__":
     # Get model, print summary, and train using a generator
     model = get_model()
     model.summary()
-    model.fit_generator(generate_batch(X_train, y_train), samples_per_epoch=24000, nb_epoch=30, validation_data=generate_batch(X_validation, y_validation), nb_val_samples=1024)#, callbacks=[early_stop])
+    model.fit_generator(generate_batch(X_train, y_train), samples_per_epoch=24000, nb_epoch=28, validation_data=generate_batch(X_validation, y_validation), nb_val_samples=1024)#, callbacks=[early_stop])
 
     print('Saving model weights and configuration file.')
     # Save model weights
