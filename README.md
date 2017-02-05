@@ -52,7 +52,7 @@ The data was collected by driving the car around the track in training mode, whi
 
 The network consists of 9 layers, including a normalization layer, 5 convolutional layers, and 3 fully connected layers. An image and summary of the network can be found below. I use dropout after each layer with drop probabilities ranging from 0.1 after the first convolutional layer to 0.5 after the final fully-connected layer. In addition, I use l2 weight regularization of 0.001. The activation function used is the exponential linear unit (ELU), and an adaptive learning rate is used via the Adam optimizer. The weights of the network are trained to minimize the mean squared error between the steering command output by the network and the steering angles of the images from the sample dataset.
 
-![Network Architecture](network_architecture2.png)
+![Network Architecture](network_architecture.png)  ![Model Summary](model_summary.png)
 
 
 
