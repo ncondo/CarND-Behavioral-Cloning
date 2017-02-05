@@ -49,7 +49,6 @@ I used only the sample data provided by Udacity to train my model, although one 
 The data was collected by driving the car around the track in training mode, which records images from three separate cameras: left, center, and right. This is done so that we have data from car being on the left and right sides of the lane, and by adding an offset to the left and right steering angles we can train our model to correct back towards the center of the lane. Using all three of the cameras provides 24,108 samples on which to train.
 
 ![Left Image Example](example_assets/left_image_example.jpeg) ![Center Image Example](example_assets/center_image_example.jpeg) ![Right Image Example](example_assets/right_image_example.jpeg)
-*Left Camera*                   *Center Camera*                     *Right Camera*
 
 ### Network Architecture
 
