@@ -48,7 +48,7 @@ As a starting point, I used Nvidia's architecture from their white paper [End to
 I used only the sample data provided by Udacity to train my model, although one could run the simulator in training mode to gather additional data. Udacity's driving simulator offers two different test tracks, and all sample data was collected from track 1 (the option on the left in the simulator's main screen). One of the optional challenges is to use only training data from track 1 and have the model navigate track 2 successfully; thus showing the model's ability to generalize. 
 The data was collected by driving the car around the track in training mode, which records images from three separate cameras: left, center, and right. This is done so that we have data from car being on the left and right sides of the lane, and by adding an offset to the left and right steering angles we can train our model to correct back towards the center of the lane. Using all three of the cameras provides 24,108 samples on which to train.
 
-![Left Image Example](example_assets/left_image_example.jpg) ![Center Image Example](example_assets/center_image_example.jpg) ![Right Image Example](example_assets/right_image_example.jpg)
+![Left Image Example](example_assets/left_image_example2.jpg) ![Center Image Example](example_assets/center_image_example2.jpg) ![Right Image Example](example_assets/right_image_example2.jpg)
 
 ### Network Architecture
 
