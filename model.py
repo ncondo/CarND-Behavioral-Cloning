@@ -1,6 +1,10 @@
 import tensorflow as tf
 import numpy as np
-import random, csv, cv2, json, h5py
+import random
+import csv
+import cv2 
+import json
+import h5py
 
 from sklearn.utils import shuffle
 from sklearn.model_selection import train_test_split
@@ -163,6 +167,7 @@ def get_model():
 
 
 if __name__=="__main__":
+
     # Get the training data from log file, shuffle, and split into train/validation datasets
     X_train, y_train = get_csv_data('data/driving_log.csv')
     X_train, y_train = shuffle(X_train, y_train, random_state=14)
@@ -180,7 +185,7 @@ if __name__=="__main__":
     with open('model.json', 'w') as outfile:
         json.dump(model.to_json(), outfile)
 
-
+    # Explicitly end tensorflow session
     from keras import backend as K 
 
     K.clear_session()

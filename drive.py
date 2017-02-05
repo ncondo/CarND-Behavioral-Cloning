@@ -72,6 +72,7 @@ def send_control(steering_angle, throttle):
 
 
 if __name__ == '__main__':
+
     parser = argparse.ArgumentParser(description='Remote Driving')
     parser.add_argument(
         'model',
@@ -86,8 +87,6 @@ if __name__ == '__main__':
         help='Path to image folder. This is where the images from the run will be saved.'
     )
     args = parser.parse_args()
-
-    #model = load_model(args.model)
 
     with open(args.model, 'r') as jfile:
         model = model_from_json(json.loads(jfile.read()))
