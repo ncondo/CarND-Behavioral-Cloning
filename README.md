@@ -74,7 +74,7 @@ Training is done via a keras fit generator, which constantly feeds the model dat
 
 The model is able to successfully navigate both track 1 and track 2 without much trouble. There are a couple areas of track 1 where the steering isn't very smooth, specifically around the first sharp turn. Surprisingly, the model performs better on track 2, from which it hasn't seen any sample data. The drive on track 2 is flawless and the car almost always stays in the center of the track. Overall, I am very happy with the outcome of this project and I look forward to one day testing some of my models on a real car. 
 
-![Track 1](example_assets/track1.gif)   ![Track 2](example_assets/track2.gif)
+You can find vidoes of my test runs here: [Track 1](https://youtu.be/rA6xbC0J1aQ) [Track 2](https://youtu.be/ajTGP91XADg)
 
 
 
