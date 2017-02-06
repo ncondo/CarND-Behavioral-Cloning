@@ -2,6 +2,8 @@
 
 The goal of this project is to train a deep neural network to clone driving behavior by using images to predict steering angles. Once the model is trained, it will be used to drive a car autonomously around a test track in Udacity's driving simulator.
 
+![Track 1 Car](example_assets/track1_car.gif)   ![Track 2 Car](example_assets/track2_car.gif)
+
 
 ## Requirements and Installation
 
